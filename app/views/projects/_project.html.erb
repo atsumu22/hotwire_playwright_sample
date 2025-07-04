@@ -1,6 +1,8 @@
 <div id="<%= dom_id project %>" class="my-3 bg-amber-100 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
   <div class="p-6">
     <h3 class="text-xl font-bold text-gray-900 mb-2"><%= project.name %></h3>
-    <%= link_to "詳細を見る", project, class: "btn btn-secondary" %>
+    <% if local_assigns.fetch(:show_link, true) %>
+      <%= link_to "詳細を見る", project, class: "btn btn-secondary" %>
+    <% end %>
   </div>
 </div>

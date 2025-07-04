@@ -23,3 +23,5 @@ end
 gem "kaminari"
 gem "ransack"
 gem "tailwindcss-rails"
+gem "turbo-rails"
+gem "importmap-rails"

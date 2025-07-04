@@ -5,21 +5,19 @@
 <h1 class="text-lg font-semibold text-gray-900">Project一覧</h1>
 
 <%= search_form_for @search do |f| %>
-  <%= f.label :name_cont, class: "block text-sm font-medium text-gray-700 mb-1" %>
   <%= f.search_field :name_cont, class: "bg-white px-4 py-2 border border-gray-300 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400" %>
 
   <%= f.submit class: "btn btn-primary" %>
   <%= link_to "クリア", projects_path, class: "btn btn-secondary" %>
 <% end %>
+<%= turbo_frame_tag "projects-list" do %>
+  <%= sort_link(@search, :name, class: "mt-2 btn btn-primary") %>
+  <div id="projects">
+    <% @projects.each do |project| %>
+      <%= render project, show_link: true %>
+    <% end %>
+  </div>
 
-<%= sort_link(@search, :name) %>
-
-<div id="projects">
-  <% @projects.each do |project| %>
-    <%= render project %>
-  <% end %>
-</div>
-
-<%= paginate @projects %>
-
-<%= link_to "プロジェクトを追加する", new_project_path, class: "inline-block bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors" %>
+  <%= paginate @projects %>
+<% end %>
+<%= link_to "プロジェクトを追加する", new_project_path, class: "btn btn-danger" %>
