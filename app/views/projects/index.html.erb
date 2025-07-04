@@ -4,7 +4,7 @@
 
 <h1 class="text-lg font-semibold text-gray-900">Project一覧</h1>
 
-<%= search_form_for @search do |f| %>
+<%= search_form_for @search, html: { data: { turbo_frame: "projects-list" }} do |f| %>
   <%= f.search_field :name_cont, class: "bg-white px-4 py-2 border border-gray-300 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400" %>
 
   <%= f.submit class: "btn btn-primary" %>

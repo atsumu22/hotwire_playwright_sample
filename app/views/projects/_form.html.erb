@@ -1,22 +1,27 @@
-<%= form_with(model: project) do |form| %>
-  <% if project.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(project.errors.count, "error") %> prohibited this project from being saved:</h2>
+<%= turbo_frame_tag project do %>
+  <div class="my-3 bg-amber-100 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+    <%= form_with(model: project) do |form| %>
+    <div class="p-6 flex items-center justify-between">
+      <div class="flex items-center justify-start" >
+        <%= form.text_field :name, class: "bg-white my-2 me-4 px-4 py-2 border border-gray-300 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"  %>
+          <% if project.errors.any? %>
+            <div style="color: red">
+              <h2><%= pluralize(project.errors.count, "error") %> prohibited this project from being saved:</h2>
 
-      <ul>
-        <% project.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+              <ul>
+                <% project.errors.each do |error| %>
+                  <li><%= error.full_message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+        </div>
 
-  <div class="flex items-center justify-start" >
-    <%= form.label "プロジェクト名", style: "display: block", class: "me-2" %>
-    <%= form.text_field :name, class: "bg-white my-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"  %>
-  </div>
-
-  <div>
-    <%= form.submit class: 'btn btn-primary' %>
+        <div>
+          <%= form.submit class: 'btn btn-primary' %>
+          <%= link_to "やめる", project, class: "btn btn-secondary" %>
+        </div>
+      </div>
+    <% end %>
   </div>
 <% end %>
