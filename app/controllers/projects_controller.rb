@@ -28,7 +28,7 @@ class ProjectsController < ApplicationController
     @project = Project.new(project_params)
 
     if @project.save
-      redirect_to @project, notice: "Project was successfully created."
+      flash.now.notice = "プロジェクトを登録しました"
     else
       render :new, status: :unprocessable_entity
     end
@@ -37,7 +37,8 @@ class ProjectsController < ApplicationController
   # PATCH/PUT /projects/1
   def update
     if @project.update(project_params)
-      redirect_to @project, notice: "Project was successfully updated.", status: :see_other
+      # redirect_toを明示しない場合は暗黙的に'render'が実行される
+      flash.now.notice = "プロジェクトを更新しました"
     else
       render :edit, status: :unprocessable_entity
     end
@@ -46,7 +47,7 @@ class ProjectsController < ApplicationController
   # DELETE /projects/1
   def destroy
     @project.destroy!
-    redirect_to projects_path, notice: "Project was successfully destroyed.", status: :see_other
+    flash.now.notice = "プロジェクトを削除しました"
   end
 
   private

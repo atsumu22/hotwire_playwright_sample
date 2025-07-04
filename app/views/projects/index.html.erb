@@ -10,8 +10,13 @@
   <%= f.submit class: "btn btn-primary" %>
   <%= link_to "クリア", projects_path, class: "btn btn-secondary" %>
 <% end %>
+
 <%= turbo_frame_tag "projects-list" do %>
-  <%= sort_link(@search, :name, class: "mt-2 btn btn-primary") %>
+  <div class="flex items-center justify-between">
+    <%= sort_link(@search, :name, class: "mt-2 btn btn-primary") %>
+    <%= link_to "プロジェクトを追加する", new_project_path, class: "btn btn-primary", data: { turbo_frame: "new_project" } %>
+  </div>
+  <%= turbo_frame_tag "new_project" %>
   <div id="projects">
     <% @projects.each do |project| %>
       <%= render project, show_link: true %>
@@ -20,4 +25,3 @@
 
   <%= paginate @projects %>
 <% end %>
-<%= link_to "プロジェクトを追加する", new_project_path, class: "btn btn-danger" %>

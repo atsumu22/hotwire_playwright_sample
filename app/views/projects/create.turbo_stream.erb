@@ -1,0 +1,5 @@
+<%= turbo_stream.prepend "projects", @project %>
+
+<%= turbo_stream.update Project.new, "" %>
+
+<%= turbo_stream_flash %>
