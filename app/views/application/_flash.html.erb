@@ -1,0 +1,62 @@
+<%# flashメッセージがある時だけ全体を表示する %>
+<% if flash.present? %>
+  <div class="space-y-4"> <%# 複数のflashが同時に出た時用の間隔 %>
+    <% flash.each do |key, value| %>
+      <%
+        # keyによってスタイルを切り替える準備
+        case key.to_s
+        when 'notice', 'success'
+          bg_color = 'bg-green-50'
+          border_color = 'border-green-400'
+          icon_color = 'text-green-400'
+          text_color = 'text-green-800'
+          hover_bg_color = 'hover:bg-green-100'
+          # 成功アイコン (Heroiconsより)
+          icon_svg = '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />'
+        when 'alert', 'error'
+          bg_color = 'bg-red-50'
+          border_color = 'border-red-400'
+          icon_color = 'text-red-400'
+          text_color = 'text-red-800'
+          hover_bg_color = 'hover:bg-red-100'
+          # エラーアイコン (Heroiconsより)
+          icon_svg = '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />'
+        else # notice, alert以外（例: warningなど）
+          bg_color = 'bg-yellow-50'
+          border_color = 'border-yellow-400'
+          icon_color = 'text-yellow-400'
+          text_color = 'text-yellow-800'
+          hover_bg_color = 'hover:bg-yellow-100'
+          # 警告アイコン (Heroiconsより)
+          icon_svg = '<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />'
+        end
+      %>
+
+      <%# ここからが表示される本体じゃ %>
+      <div id="flash-<%= key %>" class="rounded-md border-l-4 <%= border_color %> <%= bg_color %> p-4" role="alert">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 <%= icon_color %>" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <%= raw icon_svg %>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm <%= text_color %> font-medium">
+              <%= value %>
+            </p>
+          </div>
+          <div class="ml-auto pl-3">
+            <div class="-mx-1.5 -my-1.5">
+              <button type="button" onclick="document.getElementById('flash-<%= key %>').remove()" class="inline-flex rounded-md <%= bg_color %> p-1.5 <%= text_color %> <%= hover_bg_color %> focus:outline-none focus:ring-2 focus:ring-offset-2 <%= "focus:ring-offset-#{border_color.split('-')[0]}-50 focus:ring-#{border_color.split('-')[0]}-600" %>">
+                <span class="sr-only">Dismiss</span>
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>
