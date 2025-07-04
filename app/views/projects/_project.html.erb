@@ -1,11 +1,16 @@
 <%= turbo_frame_tag project do %>
   <div id="<%= dom_id project %>" class="my-3 bg-amber-100 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
     <div class="p-6 flex items-center justify-between">
-      <h3 class="text-xl font-bold text-gray-900 mb-2"><%= project.name %></h3>
-        <div class="flex items-center justify-last">
-          <%= link_to "編集", edit_project_path(project), class: "btn btn-primary me-2" %>
-          <%= button_to "削除", project, method: :delete, class: "btn btn-danger", form: { data: { turbo_confirm: "本当に削除しますか？" } } %>
-        </div>
+      <div class="flex items-center justify-last">
+        <h3 class="text-xl font-bold text-gray-900 me-2"><%= project.name %></h3>
+        <% if local_assigns.fetch(:show_link, true) %>
+          <%= link_to "詳細を見る", project_path(project), class: "btn btn-primary", data: { turbo: false } %>
+        <% end %>
+      </div>
+      <div class="flex items-center justify-last">
+        <%= link_to "編集", edit_project_path(project), class: "btn btn-primary me-2" %>
+        <%= button_to "削除", project, method: :delete, class: "btn btn-danger", form: { data: { turbo_confirm: "本当に削除しますか？" } } %>
+      </div>
     </div>
   </div>
 <% end %>

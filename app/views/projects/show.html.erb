@@ -2,9 +2,23 @@
 
 <%= render @project, show_link: false %>
 
-<div>
-  <%= link_to "編集する", edit_project_path(@project), class: "btn btn-primary" %> |
-  <%= link_to "プロジェクト一覧に戻る", projects_path, class: "btn btn-secondary" %>
+<h2 class="text-xl font-bold mb-4">Tasks</h2>
 
-  <%= button_to "Destroy this project", @project, method: :delete, class: "mt-2 btn btn-danger" %>
+<%= render @project.tasks %>
+
+<%= form_with(model: [@project, Task.new], data: { turbo_frame: "tasks" }) do |form| %>
+  <div class="mb-2">
+    <%= form.text_field :title, placeholder: "Task title", class: "border p-1" %>
+  </div>
+  <div>
+    <%= form.submit "Add Task", class: "bg-blue-500 text-white px-3 py-1 rounded" %>
+  </div>
+<% end %>
+
+<%= turbo_frame_tag "tasks" do %>
+  <%= render @project.tasks %>
+<% end %>
+
+<div>
+  <%= link_to "プロジェクト一覧に戻る", projects_path, class: "btn btn-secondary" %>
 </div>
