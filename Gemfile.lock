@@ -93,6 +93,10 @@ GEM
       activesupport (>= 6.1)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
+    importmap-rails (2.1.0)
+      actionpack (>= 6.0.0)
+      activesupport (>= 6.0.0)
+      railties (>= 6.0.0)
     io-console (0.8.0)
     irb (1.15.2)
       pp (>= 0.6.0)
@@ -200,6 +204,10 @@ GEM
       thor (~> 1.0, >= 1.2.2)
       zeitwerk (~> 2.6)
     rake (13.3.0)
+    ransack (4.3.0)
+      activerecord (>= 6.1.5)
+      activesupport (>= 6.1.5)
+      i18n
     rdoc (6.14.2)
       erb
       psych (>= 4.0.0)
@@ -215,8 +223,21 @@ GEM
     sqlite3 (2.7.1-x86_64-linux-gnu)
     sqlite3 (2.7.1-x86_64-linux-musl)
     stringio (3.1.7)
+    tailwindcss-rails (4.2.3)
+      railties (>= 7.0.0)
+      tailwindcss-ruby (~> 4.0)
+    tailwindcss-ruby (4.1.11)
+    tailwindcss-ruby (4.1.11-aarch64-linux-gnu)
+    tailwindcss-ruby (4.1.11-aarch64-linux-musl)
+    tailwindcss-ruby (4.1.11-arm64-darwin)
+    tailwindcss-ruby (4.1.11-x86_64-darwin)
+    tailwindcss-ruby (4.1.11-x86_64-linux-gnu)
+    tailwindcss-ruby (4.1.11-x86_64-linux-musl)
     thor (1.3.2)
     timeout (0.4.3)
+    turbo-rails (2.0.16)
+      actionpack (>= 7.1.0)
+      railties (>= 7.1.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uri (1.0.3)
@@ -240,11 +261,15 @@ PLATFORMS
 DEPENDENCIES
   bundler-audit
   debug
+  importmap-rails
   kaminari
   propshaft
   puma (>= 5.0)
   rails (~> 8.0.1)
+  ransack
   sqlite3 (>= 2.1)
+  tailwindcss-rails
+  turbo-rails
   tzinfo-data
 
 BUNDLED WITH

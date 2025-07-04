@@ -18,6 +18,10 @@ group :development, :test do
 
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem "bundler-audit", require: false
-  
-  gem "kaminari"
 end
+
+gem "kaminari"
+gem "ransack"
+gem "tailwindcss-rails"
+gem "turbo-rails"
+gem "importmap-rails"

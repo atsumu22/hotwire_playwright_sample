@@ -2,17 +2,22 @@
 
 <% content_for :title, "Projects" %>
 
-<h1>Projects</h1>
+<h1 class="text-lg font-semibold text-gray-900">Project一覧</h1>
 
-<div id="projects">
-  <% @projects.each do |project| %>
-    <%= render project %>
-    <p>
-      <%= link_to "Show this project", project %>
-    </p>
-  <% end %>
-</div>
+<%= search_form_for @search do |f| %>
+  <%= f.search_field :name_cont, class: "bg-white px-4 py-2 border border-gray-300 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400" %>
 
-<%= paginate @projects %>
+  <%= f.submit class: "btn btn-primary" %>
+  <%= link_to "クリア", projects_path, class: "btn btn-secondary" %>
+<% end %>
+<%= turbo_frame_tag "projects-list" do %>
+  <%= sort_link(@search, :name, class: "mt-2 btn btn-primary") %>
+  <div id="projects">
+    <% @projects.each do |project| %>
+      <%= render project, show_link: true %>
+    <% end %>
+  </div>
 
-<%= link_to "New project", new_project_path %>
+  <%= paginate @projects %>
+<% end %>
+<%= link_to "プロジェクトを追加する", new_project_path, class: "btn btn-danger" %>
