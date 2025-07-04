@@ -22,7 +22,10 @@
     <%= stylesheet_link_tag :app %>
   </head>
 
-  <body>
-    <%= yield %>
+  <body class="h-full bg-amber-200">
+    <%= render 'layouts/header' %>
+    <main class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+      <%= yield %>
+    </main>
   </body>
 </html>

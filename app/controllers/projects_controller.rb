@@ -3,7 +3,11 @@ class ProjectsController < ApplicationController
 
   # GET /projects
   def index
-    @projects = Project.page(params[:page])
+    @search = Project.ransack(params[:q])
+
+    @search.sorts = 'id desc' if @search.sorts.empty?
+
+    @projects = @search.result.page(params[:page])
   end
 
   # GET /projects/1
