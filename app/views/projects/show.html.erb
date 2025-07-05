@@ -4,17 +4,8 @@
 
 <h2 class="text-xl font-bold mb-4">Tasks</h2>
 
-<%= render @project.tasks %>
-
-<%= form_with(model: [@project, Task.new], data: { turbo_frame: "tasks" }) do |form| %>
-  <div class="mb-2">
-    <%= form.text_field :title, placeholder: "Task title", class: "border p-1" %>
-  </div>
-  <div>
-    <%= form.submit "Add Task", class: "bg-blue-500 text-white px-3 py-1 rounded" %>
-  </div>
-<% end %>
-
+<%= link_to "タスクを追加する", new_project_task_path(@project), class: "btn btn-primary mb-2", data: { turbo_frame: "new_task" } %>
+<%= turbo_frame_tag "new_task" %>
 <%= turbo_frame_tag "tasks" do %>
   <%= render @project.tasks %>
 <% end %>
