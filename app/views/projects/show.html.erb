@@ -3,7 +3,6 @@
 <%= render @project, show_link: false %>
 
 <h2 class="text-xl font-bold mb-4">Tasks</h2>
-
 <%= link_to "タスクを追加する", new_project_task_path(@project), class: "btn btn-primary mb-2", data: { turbo_frame: "new_task" } %>
 <%= turbo_frame_tag "new_task" %>
 <%= turbo_frame_tag "tasks" do %>

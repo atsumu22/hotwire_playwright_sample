@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   resources :comments
   resources :projects do
     resources :tasks
+    resource :task_completed, only: [:update]
   end
   root "projects#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
