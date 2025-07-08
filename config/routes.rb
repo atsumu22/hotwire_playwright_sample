@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   resources :comments
   resources :projects do
+    member do
+      post :sort_tasks
+    end
     resources :tasks
     resource :task_completed, only: [:update]
   end

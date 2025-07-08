@@ -4,9 +4,21 @@
 
 <h2 class="text-xl font-bold mb-4">Tasks</h2>
 <%= link_to "タスクを追加する", new_project_task_path(@project), class: "btn btn-primary mb-2", data: { turbo_frame: "new_task" } %>
-<%= turbo_frame_tag "new_task" %>
 <%= turbo_frame_tag "tasks" do %>
-  <%= render @project.tasks %>
+
+<%= search_form_for @q, url: sort_tasks_project_path(@project), method: :get, html: { data: { turbo_frame: "tasks" }} do |f| %>
+  <div class="sort_links mb-2">
+    <%= f.sort_link :title, "タスク名", class: "btn btn-info btn-sm px-4 py-3 font-medium text-left text-gray-600 rounded-lg hover:bg-gray-100" %>
+    <%= f.sort_link :status, "ステータス", class: "btn btn-info btn-sm px-4 py-3 font-medium text-left text-gray-600 rounded-lg hover:bg-gray-100m" %>
+    <%= f.sort_link :sort_order, "優先度", class: "btn btn-info btn-sm px-4 py-3 font-medium text-left text-gray-600 rounded-lg hover:bg-gray-100m" %>
+    <%= f.sort_link :created_at, "追加順", class: "btn btn-info btn-sm px-4 py-3 font-medium text-left text-gray-600 rounded-lg hover:bg-gray-100m" %>
+  </div>
+<% end %>
+
+<%= turbo_frame_tag "new_task" %>
+  <div id="project-tasks">
+    <%= render @tasks %>
+  </div>
 <% end %>
 
 <div>
