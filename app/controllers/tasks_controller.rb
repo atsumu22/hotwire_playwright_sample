@@ -1,9 +1,10 @@
 class TasksController < ApplicationController
+  before_action :set_project
   before_action :set_task, only: %i[ show edit update destroy ]
 
   # GET /tasks
   def index
-    @tasks = Task.all
+    @tasks = @project.tasks
   end
 
   # GET /tasks/1
@@ -12,7 +13,7 @@ class TasksController < ApplicationController
 
   # GET /tasks/new
   def new
-    @task = Task.new
+    @task = @project.tasks.build
   end
 
   # GET /tasks/1/edit
@@ -21,10 +22,10 @@ class TasksController < ApplicationController
 
   # POST /tasks
   def create
-    @task = Task.new(task_params)
+    @task = @project.tasks.build(task_params)
 
     if @task.save
-      redirect_to @task, notice: "Task was successfully created."
+      flash.now.notice = "タスクを追加しました"
     else
       render :new, status: :unprocessable_entity
     end
@@ -33,7 +34,7 @@ class TasksController < ApplicationController
   # PATCH/PUT /tasks/1
   def update
     if @task.update(task_params)
-      redirect_to @task, notice: "Task was successfully updated.", status: :see_other
+      flash.now.notice = "タスクを更新しました"
     else
       render :edit, status: :unprocessable_entity
     end
@@ -42,13 +43,16 @@ class TasksController < ApplicationController
   # DELETE /tasks/1
   def destroy
     @task.destroy!
-    redirect_to tasks_path, notice: "Task was successfully destroyed.", status: :see_other
+    flash.now.notice = "タスクを削除しました"
   end
 
   private
+    def set_project
+      @project = Project.find(params[:project_id])
+    end
     # Use callbacks to share common setup or constraints between actions.
     def set_task
-      @task = Task.find(params.expect(:id))
+      @task = @project.tasks.find(params.expect(:id))
     end
 
     # Only allow a list of trusted parameters through.

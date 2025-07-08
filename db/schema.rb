@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_03_214202) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_06_120323) do
   create_table "comments", force: :cascade do |t|
     t.text "content"
     t.integer "task_id", null: false
@@ -27,11 +27,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_03_214202) do
 
   create_table "tasks", force: :cascade do |t|
     t.string "title"
-    t.string "status"
     t.integer "sort_order"
     t.integer "project_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "status"
     t.index ["project_id"], name: "index_tasks_on_project_id"
   end
 

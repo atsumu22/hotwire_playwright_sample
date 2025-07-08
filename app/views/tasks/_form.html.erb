@@ -1,37 +1,32 @@
-<%= form_with(model: task) do |form| %>
-  <% if task.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(task.errors.count, "error") %> prohibited this task from being saved:</h2>
+<%= turbo_frame_tag task do %>
+  <%= form_with(model: [@project, task]) do |form| %>
+    <% if task.errors.any? %>
+      <div style="color: red">
+        <h2><%= pluralize(task.errors.count, "error") %> prohibited this task from being saved:</h2>
 
-      <ul>
-        <% task.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+        <ul>
+          <% task.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="flex items-center justify-start">
+      <div>
+        <%= form.label "タスク名", style: "display: block" %>
+        <%= form.text_field :title, class: "bg-white my-2 me-4 px-4 py-2 border border-gray-300 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"  %>
+      </div>
+
+      <div>
+        <%= form.label "優先度", style: "display: block" %>
+        <%= form.number_field :sort_order, class: "bg-white my-2 me-4 px-4 py-2 border border-gray-300 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400" %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.submit class: "btn btn-primary" %>
+      <%= link_to "やめる", @project, class: "btn btn-secondary" %>
     </div>
   <% end %>
-
-  <div>
-    <%= form.label :title, style: "display: block" %>
-    <%= form.text_field :title %>
-  </div>
-
-  <div>
-    <%= form.label :status, style: "display: block" %>
-    <%= form.text_field :status %>
-  </div>
-
-  <div>
-    <%= form.label :sort_order, style: "display: block" %>
-    <%= form.number_field :sort_order %>
-  </div>
-
-  <div>
-    <%= form.label :project_id, style: "display: block" %>
-    <%= form.text_field :project_id %>
-  </div>
-
-  <div>
-    <%= form.submit %>
-  </div>
 <% end %>

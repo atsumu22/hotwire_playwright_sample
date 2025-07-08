@@ -1,17 +1,23 @@
 class ProjectsController < ApplicationController
-  before_action :set_project, only: %i[ show edit update destroy ]
+  before_action :set_project, only: %i[ show edit update destroy sort_tasks ]
 
   # GET /projects
   def index
     @search = Project.ransack(params[:q])
-
-    @search.sorts = 'id desc' if @search.sorts.empty?
-
     @projects = @search.result.page(params[:page])
   end
 
   # GET /projects/1
   def show
+    @q = @project.tasks.ransack(params[:q])
+    @tasks = @q.result.order(created_at: :desc)
+
+    @task = @project.tasks.build
+  end
+
+  def sort_tasks
+    @q = @project.tasks.ransack(params[:q])
+    @tasks = @q.result.order(created_at: :desc)
   end
 
   # GET /projects/new

@@ -2,7 +2,16 @@
 
 <% content_for :title, "Tasks" %>
 
-<h1>Tasks</h1>
+<h1 class="text-lg font-semibold text-gray-900">Tasks</h1>
+
+<%= form_with(model: [@project, Task.new], data: { turbo_frame: "tasks" }) do |form| %>
+  <div class="mb-2">
+    <%= form.text_field :title, placeholder: "Task title", class: "border p-1" %>
+  </div>
+  <div>
+    <%= form.submit "Add Task", class: "bg-blue-500 text-white px-3 py-1 rounded" %>
+  </div>
+<% end %>
 
 <div id="tasks">
   <% @tasks.each do |task| %>
