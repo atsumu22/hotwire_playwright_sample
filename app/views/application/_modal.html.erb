@@ -1,16 +1,28 @@
-<div data-modal-target="modalElement"
-  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden"
+<div data-modal-target="modal"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 <%= local_assigns[:open] ? '' : 'hidden' %>"
+  aria-labelledby="modal-title" role="dialog" aria-modal="<%= local_assigns[:open] ? 'true' : 'false' %>"
   data-action="click->modal#closeBackground"
 >
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">サンプル</h5>
-        <button type="button" data-action="modal#close" class="px-4 py-2 bg-red-500 text-white text-base font-medium">閉じる</button>
-      </div>
-      <div class="modal-body">
-        <%= yield %>
-      </div>
+  <div class="fixed inset-0 bg-black opacity-50" data-action="click->modal#closeBackground"></div>
+
+  <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full p-6 animate-fade-in-scale">
+    <%# ヘッダー %>
+    <div class="flex justify-between items-center border-b pb-3 mb-4">
+      <h3 class="text-xl font-semibold text-gray-800" id="modal-title">
+        <%= local_assigns[:title] || "モーダルのタイトル" %>
+      </h3>
+      <%# 閉じるボタン - Stimulusアクションを呼び出す %>
+      <button type="button" data-action="modal#close" class="text-gray-400 hover:text-gray-600 text-2xl">
+        &times;
+      </button>
     </div>
+
+    <%= turbo_frame_tag "modal_content_frame" do %>
+      <%# このフレームが更新されるまで、初期表示は空にしておく %>
+      <% if content_for?(:modal_content) %>
+        <%= yield :modal_content %>
+      <% end %>
+    <% end %>
+
   </div>
 </div>

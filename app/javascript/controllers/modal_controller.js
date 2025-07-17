@@ -1,22 +1,17 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects with data-controller="modal"
 export default class extends Controller {
-  // ここがポイントよ！モーダルの要素を「modalElement」として指定するの。
-  // Stimulusがこの名前でHTMLの中から要素を見つけてくれるわ。
-  static targets = ["modalElement"]
+  static targets = ["modal"]
 
-  // コントローラがHTML要素に接続されたときに呼ばれるわ
   connect() {
     console.log("Modal controller connected! Ready to show/hide modals.");
-    // デバッグ用よ。普段はなくてもいいわ。
+    // デバッグ用
   }
 
   // --- モーダルを開くアクション ---
   open() {
-    // modalElementTarget の hidden クラスを外して表示するの
     this.modalElementTarget.classList.remove("hidden");
-    // 背景のスクロールを止めて、モーダルに集中させるわ
+    this.modalTarget.setAttribute("aria-hidden", "false")
     document.body.classList.add("overflow-hidden");
 
     // Escキーでの終了処理は、モーダルが開いた時にイベントリスナーを追加するのがスマートね
@@ -26,10 +21,11 @@ export default class extends Controller {
 
   // --- モーダルを閉じるアクション ---
   close() {
-    // modalElementTarget に hidden クラスを付けて非表示にするの
-    this.modalElementTarget.classList.add("hidden");
-    // 背景のスクロールを元に戻すのよ
-    document.body.classList.remove("overflow-hidden");
+    this.modalTarget.classList.add("hidden")
+    this.modalTarget.setAttribute("aria-hidden", "true")
+    document.body.classList.remove("overflow-hidden")
+    // もしモーダル内のTurbo Frameをクリアしたいなら、ここに追加
+    // 例: this.element.querySelector("#modal_content_frame").innerHTML = ""
 
     // イベントリスナーは、モーダルを閉じたら忘れずに削除するのよ。
     // これをしないと、メモリの無駄遣いになったり、予期せぬ動作につながることがあるからね。
@@ -40,19 +36,21 @@ export default class extends Controller {
   }
 
   // --- 背景クリックで閉じる機能 ---
-  // data-action="click->modal#closeBackground" で呼び出されるわ
+  // data-action="click->modal#closeBackground" をオーバーレイ要素に設定
   closeBackground(event) {
-    // クリックされたのがモーダルのオーバーレイ（背景部分）だったら閉じるのよ
-    // モーダルのコンテンツ部分をクリックしても閉じないようにするためね
-    if (event.target === this.modalElementTarget) {
-      this.close();
+    if (event.target === this.modalTarget) {
+      this.close()
     }
   }
 
   // --- Escキーで閉じる機能 ---
   // open() メソッドで document にイベントリスナーを追加しているから、
   // Escキーが押されたらこのメソッドが呼ばれるわ
-  closeWithEscape(event) {
+
+
+  // Escキーで閉じる（Stimulusのイベントリスナー）
+  // data-action="keydown@window->modal#closeWithKeyboard" を<body>など親要素に設定
+  closeWithKeyboard(event) {
     if (event.key === "Escape") {
       this.close();
     }
