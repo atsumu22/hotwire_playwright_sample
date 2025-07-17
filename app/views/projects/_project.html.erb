@@ -1,5 +1,8 @@
 <%= turbo_frame_tag project do %>
-  <div id="<%= dom_id project %>" class="my-3 bg-amber-100 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+  <div
+    id="<%= dom_id project %>"
+    class="my-3 bg-amber-100 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+  >
     <div class="p-6 flex items-center justify-between">
       <div class="flex items-center justify-last">
         <h3 class="text-xl font-bold text-gray-900 me-2"><%= project.name %></h3>

@@ -14,10 +14,12 @@ class TasksController < ApplicationController
   # GET /tasks/new
   def new
     @task = @project.tasks.build
+    render turbo_stream: turbo_stream.update("modal_content_frame", partial: "tasks/form", locals: { project: @project, task: @task })
   end
 
   # GET /tasks/1/edit
   def edit
+    render turbo_stream: turbo_stream.update("modal_content_frame", partial: "tasks/form", locals: { project: @project, task: @task })
   end
 
   # POST /tasks
