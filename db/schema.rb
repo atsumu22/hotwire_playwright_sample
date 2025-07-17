@@ -31,7 +31,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_06_120323) do
     t.integer "project_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "status"
+    t.boolean "status", default: false
     t.index ["project_id"], name: "index_tasks_on_project_id"
   end
 

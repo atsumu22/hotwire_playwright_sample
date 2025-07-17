@@ -3,7 +3,9 @@
 <%= render @project, show_link: false %>
 <div data-controller="modal">
   <h2 class="text-xl font-bold mb-4">Tasks</h2>
-  <%= link_to "タスクを追加する", new_project_task_path(@project), class: "btn btn-primary mb-2", data: { action: "modal#open" } %>
+  <%= link_to "タスクを追加する", new_project_task_path(@project),
+              class: "btn btn-primary mb-2",
+              data: { turbo_frame: "modal_content_frame", action: "click->modal#open" } %>
   <%= turbo_frame_tag "tasks" do %>
 
   <%= search_form_for @q, url: sort_tasks_project_path(@project), method: :get, html: { data: { turbo_frame: "tasks" }} do |f| %>

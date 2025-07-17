@@ -10,13 +10,13 @@ export default class extends Controller {
 
   // --- モーダルを開くアクション ---
   open() {
-    this.modalElementTarget.classList.remove("hidden");
+    this.modalTarget.classList.remove("hidden");
     this.modalTarget.setAttribute("aria-hidden", "false")
     document.body.classList.add("overflow-hidden");
 
     // Escキーでの終了処理は、モーダルが開いた時にイベントリスナーを追加するのがスマートね
-    this.boundCloseWithEscape = this.closeWithEscape.bind(this); // thisの参照を正しく保つためよ
-    document.addEventListener("keydown", this.boundCloseWithEscape);
+    // this.boundCloseWithEscape = this.closeWithEscape.bind(this); // thisの参照を正しく保つためよ
+    // document.addEventListener("keydown", this.boundCloseWithEscape);
   }
 
   // --- モーダルを閉じるアクション ---
