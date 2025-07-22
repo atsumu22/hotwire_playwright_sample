@@ -5,7 +5,11 @@ export default class extends Controller {
 
   connect() {
     console.log("Modal controller connected! Ready to show/hide modals.");
-    // デバッグ用
+    this.element.addEventListener("turbo:submit-end", this.handleSubmitEnd)
+  }
+
+  disconnect() {
+    this.element.removeEventListener("turbo:submit-end", this.handleSubmitEnd)
   }
 
   // --- モーダルを開くアクション ---
@@ -38,6 +42,14 @@ export default class extends Controller {
   closeWithKeyboard(event) {
     if (event.key === "Escape") {
       this.close();
+    }
+  }
+
+  // --- フォームSubmit成功時にモーダルを閉じる ---
+  handleSubmitEnd = (event) => {
+    // 成功（HTTPステータスが2xx）なら閉じる
+    if (event.detail.success) {
+      this.close()
     }
   }
 }
