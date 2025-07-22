@@ -3,19 +3,12 @@
     <%= form_with(model: project) do |form| %>
     <div class="p-6 flex items-center justify-between">
       <div class="flex items-center justify-start" >
-        <%= form.text_field :name, class: "bg-white my-2 me-4 px-4 py-2 border border-gray-300 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"  %>
-          <% if project.errors.any? %>
-            <div style="color: red">
-              <h2><%= pluralize(project.errors.count, "error") %> prohibited this project from being saved:</h2>
-
-              <ul>
-                <% project.errors.each do |error| %>
-                  <li><%= error.full_message %></li>
-                <% end %>
-              </ul>
-            </div>
-          <% end %>
-        </div>
+        <%= form.text_field :name, class: "bg-white my-2 me-4 px-4 py-2 border border-gray-300 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 #{'border-red-500 shadow-md shadow-red-200' if project.errors[:name].any?}"  %>
+        <% project.errors[:name].each do |msg| %>
+          <div class="text-red-500 text-sm mt-1"><%= "プロジェクト名#{msg}" %></div>
+        <% end %>
+      
+      </div>
 
         <div>
           <%= form.submit class: 'btn btn-primary' %>

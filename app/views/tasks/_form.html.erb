@@ -1,21 +1,13 @@
 <%= turbo_frame_tag task do %>
   <%= form_with(model: [@project, task]) do |form| %>
-    <% if task.errors.any? %>
-      <div style="color: red">
-        <h2><%= pluralize(task.errors.count, "error") %> prohibited this task from being saved:</h2>
-
-        <ul>
-          <% task.errors.each do |error| %>
-            <li><%= error.full_message %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
 
     <div class="flex items-center justify-start">
       <div>
-        <%= form.label "タスク名", style: "display: block" %>
-        <%= form.text_field :title, class: "bg-white my-2 me-4 px-4 py-2 border border-gray-300 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"  %>
+        <%= form.label "タスク名", style: "display: block", class: "#{'text-red-500' if task.errors[:title].any?}" %>
+        <% task.errors[:title].each do |msg| %>
+          <div class="text-red-500 text-sm mt-1"><%= msg %></div>
+        <% end %>
+        <%= form.text_field :title, class: "bg-white my-2 me-4 px-4 py-2 border border-gray-300 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 #{'border-red-500 shadow-md shadow-red-200' if task.errors[:title].any?}"  %>
       </div>
 
       <div>
