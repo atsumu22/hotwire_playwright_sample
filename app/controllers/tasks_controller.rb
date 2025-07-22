@@ -26,10 +26,28 @@ class TasksController < ApplicationController
   def create
     @task = @project.tasks.build(task_params)
 
-    if @task.save
-      flash.now.notice = "タスクを追加しました"
-    else
-      render :new, status: :unprocessable_entity
+    respond_to do |format|
+      if @task.save
+        format.html { redirect_to @project, notice: "タスクが作成されました。" } # 通常のHTMLリクエストにも対応
+        format.turbo_stream do
+          # ここで、create.turbo_stream.erb の内容を直接書くか、
+          # あるいは create.turbo_stream.erb ファイルがあれば、そちらが自動でレンダリングされる
+          render turbo_stream: [ # 明示的に Turbo Stream レスポンスを構築
+            turbo_stream.append("project-tasks", partial: "tasks/task", locals: { task: @task }),
+            # Rails 8 なので、これでOKよ！カスタムヘルパーは不要。
+            turbo_stream.action("stimulus_dispatch", { controller: "modal", action: "close" }),
+            turbo_stream.prepend("notice", "<p class='text-green-500'>タスクを追加しました。</p>")
+          ]
+        end
+      else
+        # 保存失敗時は、フォームを再表示
+        format.html { render :new, status: :unprocessable_entity }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.update("modal_content_frame", partial: "tasks/form", locals: { project: @project, task: @task })
+          ], status: :unprocessable_entity
+        end
+      end
     end
   end
 
