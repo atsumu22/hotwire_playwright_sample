@@ -12,6 +12,9 @@
           </label>
         <% end %>
         <p><%= task.title %></p>
+        <% if task.status %>
+          <span class="ms-5 inline-block px-4 py-1 text-xs font-semibold rounded-full border-2 border-blue-700 bg-blue-100 text-blue-700">Done</span>
+        <% end %>
       </div>
       <div class="flex items-center justify-last">
         <%= link_to "編集", edit_project_task_path(@project, task),
