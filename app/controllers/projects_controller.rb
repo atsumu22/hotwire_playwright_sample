@@ -9,10 +9,14 @@ class ProjectsController < ApplicationController
 
   # GET /projects/1
   def show
-    @q = @project.tasks.ransack(params[:q])
-    @tasks = @q.result.order(created_at: :desc)
+    if turbo_frame_request?
+      render partial: "projects/project", locals: { project: @project }
+    else
+      @q = @project.tasks.ransack(params[:q])
+      @tasks = @q.result.order(created_at: :desc)
 
-    @task = @project.tasks.build
+      @task = @project.tasks.build
+    end
   end
 
   def sort_tasks
