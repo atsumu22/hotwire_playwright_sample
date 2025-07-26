@@ -11,7 +11,7 @@
 
     <div data-controller="complete-all">
       <%= button_to project_all_tasks_completed_path(@project),
-            class: "btn btn-secondary bg-red-500 text-white border-red-500",
+            class: "btn btn-secondary bg-green-500 text-white border-green-500",
             method: :patch,
             form: { data: { turbo_frame: "tasks" } },
             data: { turbo_action: "replace" } do %>
