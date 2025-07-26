@@ -3,10 +3,27 @@
 <h1 class="text-xl font-bold border-b-4 border-orange-500 pb-2 mb-5"><%= @project.name %></h1>
 <div data-controller="modal">
   <h2 class="text-l font-bold mb-4">Tasks</h2>
-  <%= link_to "タスクを追加する", new_project_task_path(@project),
-              class: "btn btn-primary mb-2",
-              data: { turbo_frame: "modal_content_frame", action: "click->modal#open", modal_title:
-      "タスクを登録する" } %>
+  <div class="flex items-center">
+    <%= link_to "タスクを追加する", new_project_task_path(@project),
+                class: "btn btn-primary me-2",
+                data: { turbo_frame: "modal_content_frame", action: "click->modal#open", modal_title:
+        "タスクを登録する" } %>
+
+    <div data-controller="complete-all">
+      <%= button_to project_all_tasks_completed_path(@project),
+            class: "btn btn-secondary bg-red-500 text-white border-red-500",
+            method: :patch,
+            form: { data: { turbo_frame: "tasks" } },
+            data: { turbo_action: "replace" } do %>
+
+        <span data-complete-all-target="button">
+          <span data-complete-all-target="spinner" class="hidden animate-spin me-2">🔄</span>
+          <span data-complete-all-target="label">すべて完了にする</span>
+        </span>
+      <% end %>
+    </div>
+  </div>
+
   <%= turbo_frame_tag "tasks" do %>
 
   <%= search_form_for @q, url: sort_tasks_project_path(@project), method: :get, html: { data: { turbo_frame: "tasks" }} do |f| %>

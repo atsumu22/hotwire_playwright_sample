@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     end
     resources :tasks
     resource :task_completed, only: [:update]
+    resource :all_tasks_completed, only: [:update]
   end
   root "projects#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
