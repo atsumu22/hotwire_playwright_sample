@@ -28,7 +28,7 @@
   <%= turbo_frame_tag "new_project" %>
   <div id="projects">
     <% @projects.each do |project| %>
-      <%= render project, show_link: true %>
+      <%= render project %>
     <% end %>
   </div>
 

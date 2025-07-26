@@ -10,7 +10,7 @@
        class="relative bg-white rounded-lg shadow-xl max-w-lg w-full p-6 animate-fade-in-scale">
     <%# ヘッダー %>
     <div class="flex justify-between items-center border-b pb-3 mb-4">
-      <h3 class="text-xl font-semibold text-gray-800" id="modal-title">
+      <h3 class="text-xl font-semibold text-gray-800" id="modal-title" data-modal-target="title">
         <%= local_assigns[:title] || "モーダルのタイトル" %>
       </h3>
       <%# 閉じるボタン - Stimulusアクションを呼び出す %>

@@ -1,2 +1,2 @@
-<%= turbo_stream.replace @project %>
+<%= turbo_stream.replace @project, partial: "projects/project", locals: { project: @project } %>
 <%= turbo_stream_flash %>
