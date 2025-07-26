@@ -19,7 +19,8 @@
       <div class="flex items-center justify-last">
         <%= link_to "編集", edit_project_task_path(@project, task),
                     class: "btn btn-primary me-2",
-                    data: { turbo_frame: "modal_content_frame", action: "click->modal#open" } %>
+                    data: { turbo_frame: "modal_content_frame", action: "click->modal#open", modal_title:
+      "タスクを編集する" } %>
         <%= button_to "削除", project_task_path(@project, task), method: :delete, class: "btn btn-danger", form: { data: { turbo_confirm: "本当に削除しますか？" } } %>
       </div>
     </div>

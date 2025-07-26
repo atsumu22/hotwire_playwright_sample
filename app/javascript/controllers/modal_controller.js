@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["modal", "content"]
+  static targets = ["modal", "content", "title"]
 
   connect() {
     console.log("Modal controller connected! Ready to show/hide modals.");
@@ -13,7 +13,9 @@ export default class extends Controller {
   }
 
   // --- モーダルを開くアクション ---
-  open() {
+  open(event) {
+    const title = event.currentTarget.dataset.modalTitle || 'モーダルのタイトル';
+    this.titleTarget.textContent = title;
     this.modalTarget.classList.remove("hidden");
     this.modalTarget.setAttribute("aria-hidden", "false")
     document.body.classList.add("overflow-hidden");
