@@ -1,48 +1,56 @@
 <p style="color: green"><%= notice %></p>
 
 <h1 class="text-xl font-bold border-b-4 border-orange-500 pb-2 mb-5"><%= @project.name %></h1>
-<div data-controller="modal">
-  <h2 class="text-l font-bold mb-4">Tasks</h2>
-  <div class="flex items-center">
-    <%= link_to "タスクを追加する", new_project_task_path(@project),
-                class: "btn btn-primary me-2",
-                data: { turbo_frame: "modal_content_frame", action: "click->modal#open", modal_title:
-        "タスクを登録する" } %>
-
+  <div data-controller="modal">
     <div data-controller="complete-all">
-      <%= button_to project_all_tasks_completed_path(@project),
-            class: "btn btn-secondary bg-green-500 text-white border-green-500",
-            method: :patch,
-            form: { data: { turbo_frame: "tasks" } },
-            data: { turbo_action: "replace" } do %>
+      <div data-complete-all-target="overlay" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+        <div class="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    <h2 class="text-l font-bold mb-4">Tasks</h2>
+    <div class="flex items-center">
+      <%= link_to "タスクを追加する", new_project_task_path(@project),
+                  class: "btn btn-primary me-2",
+                  data: { turbo_frame: "modal_content_frame", action: "click->modal#open", modal_title:
+          "タスクを登録する" } %>
 
-        <span data-complete-all-target="button">
-          <span data-complete-all-target="spinner" class="hidden animate-spin me-2">🔄</span>
-          <span data-complete-all-target="label">すべて完了にする</span>
-        </span>
-      <% end %>
+    <div data-complete-all-target="buttonArea" class="hidden">
+        <%= button_to project_all_tasks_completed_path(@project),
+              class: "btn btn-secondary bg-green-500 text-white border-green-500",
+              method: :patch,
+              form: { data: {
+                turbo_frame: "tasks",
+                action: "submit->complete-all#start"
+              } },
+              data: { turbo_action: "replace" } do %>
+
+          <span data-complete-all-target="button">
+            <span data-complete-all-target="spinner" class="hidden animate-spin me-2">🔄</span>
+            <span data-complete-all-target="label">すべて完了にする</span>
+          </span>
+        <% end %>
+      </div>
     </div>
+
+    <%= turbo_frame_tag "tasks" do %>
+
+    <%= search_form_for @q, url: sort_tasks_project_path(@project), method: :get, html: { data: { turbo_frame: "tasks" }} do |f| %>
+      <div class="sort_links mb-2">
+        <%= f.sort_link :title, "タスク名", class: "btn btn-info btn-sm px-4 py-3 font-medium text-left text-gray-600 rounded-lg hover:bg-gray-100" %>
+        <%= f.sort_link :status, "ステータス", class: "btn btn-info btn-sm px-4 py-3 font-medium text-left text-gray-600 rounded-lg hover:bg-gray-100m" %>
+        <%= f.sort_link :sort_order, "優先度", class: "btn btn-info btn-sm px-4 py-3 font-medium text-left text-gray-600 rounded-lg hover:bg-gray-100m" %>
+        <%= f.sort_link :created_at, "追加順", class: "btn btn-info btn-sm px-4 py-3 font-medium text-left text-gray-600 rounded-lg hover:bg-gray-100m" %>
+      </div>
+    <% end %>
+
+    <%= turbo_frame_tag "new_task" %>
+      <div id="project-tasks" data-complete-all-target="taskArea">
+        <%= render @tasks %>
+      </div>
+    <% end %>
+
+    <div>
+      <%= link_to "プロジェクト一覧に戻る", projects_path, class: "btn btn-secondary" %>
+    </div>
+    <%= render "application/modal" %>
   </div>
-
-  <%= turbo_frame_tag "tasks" do %>
-
-  <%= search_form_for @q, url: sort_tasks_project_path(@project), method: :get, html: { data: { turbo_frame: "tasks" }} do |f| %>
-    <div class="sort_links mb-2">
-      <%= f.sort_link :title, "タスク名", class: "btn btn-info btn-sm px-4 py-3 font-medium text-left text-gray-600 rounded-lg hover:bg-gray-100" %>
-      <%= f.sort_link :status, "ステータス", class: "btn btn-info btn-sm px-4 py-3 font-medium text-left text-gray-600 rounded-lg hover:bg-gray-100m" %>
-      <%= f.sort_link :sort_order, "優先度", class: "btn btn-info btn-sm px-4 py-3 font-medium text-left text-gray-600 rounded-lg hover:bg-gray-100m" %>
-      <%= f.sort_link :created_at, "追加順", class: "btn btn-info btn-sm px-4 py-3 font-medium text-left text-gray-600 rounded-lg hover:bg-gray-100m" %>
-    </div>
-  <% end %>
-
-  <%= turbo_frame_tag "new_task" %>
-    <div id="project-tasks">
-      <%= render @tasks %>
-    </div>
-  <% end %>
-
-  <div>
-    <%= link_to "プロジェクト一覧に戻る", projects_path, class: "btn btn-secondary" %>
-  </div>
-  <%= render "application/modal" %>
 </div>
