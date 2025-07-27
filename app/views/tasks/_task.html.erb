@@ -1,5 +1,12 @@
+<% status = task.status ? "completed" : "incomplete" %>
+
 <%= turbo_frame_tag task do %>
-  <div id="<%= dom_id task %>"class="my-3 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 <%= task.status ? 'bg-green-100' : 'bg-red-100' %>">
+  <div
+    id="<%= dom_id task %>"
+    class="my-3 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 <%= task.status ? 'bg-green-100' : 'bg-red-100' %>"
+    data-complete-all-target="task"
+    data-task-status="<%= status %>"
+  >
     <div class="p-4 flex items-center justify-between">
       <div class="flex items-center justify-start">
         <%= form_with url: project_task_completed_path(@project), method: :patch, data: { turbo_frame: dom_id(task) } do %>
