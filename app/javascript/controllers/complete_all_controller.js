@@ -4,14 +4,14 @@ export default class extends Controller {
   static targets = [ "button", "task", "buttonArea", "overlay" ]
 
   connect() {
-    this.toggleButtonVisibility()
+    this.toggleButtonAndLoaderVisibility()
   }
 
   taskTargetConnected() {
-    this.toggleButtonVisibility()
+    this.toggleButtonAndLoaderVisibility()
   }
   taskTargetDisconnected() {
-    this.toggleButtonVisibility()
+    this.toggleButtonAndLoaderVisibility()
   }
 
   start() {
@@ -19,7 +19,9 @@ export default class extends Controller {
     this.buttonAreaTarget.querySelector('button').disabled = true
   }
 
-  toggleButtonVisibility() {
+  toggleButtonAndLoaderVisibility() {
+    this.overlayTarget.classList.add('hidden')
+
     const hasIncompleteTasks = this.hasTaskTarget && this.taskTargets.some(task => task.dataset.taskStatus === "incomplete");
 
     if (hasIncompleteTasks) {
