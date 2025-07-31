@@ -22,6 +22,9 @@ group :development, :test do
   gem "rspec-rails"
   gem "capybara"
   gem "selenium-webdriver"
+  gem "factory_bot_rails"
+  gem "cuprite"
+  gem "capybara-screenshot"
 end
 
 gem "kaminari"
