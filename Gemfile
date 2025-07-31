@@ -18,6 +18,13 @@ group :development, :test do
 
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem "bundler-audit", require: false
+
+  gem "rspec-rails"
+  gem "capybara"
+  gem "selenium-webdriver"
+  gem "factory_bot_rails"
+  gem "cuprite"
+  gem "capybara-screenshot"
 end
 
 gem "kaminari"
