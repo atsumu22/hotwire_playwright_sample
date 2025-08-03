@@ -31,6 +31,7 @@ class ProjectsController < ApplicationController
 
   # GET /projects/1/edit
   def edit
+    render layout: false if turbo_frame_request?
   end
 
   # POST /projects

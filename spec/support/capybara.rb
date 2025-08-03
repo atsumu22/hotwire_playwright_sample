@@ -5,9 +5,9 @@ RSpec.configure do |config|
 
   config.before(:each, type: :system, js: true) do
     driven_by(:cuprite, screen_size: [1400, 1400], options: {
-      timeout: 50
+      timeout: 30,
+      headless: true,
     })
   end
-
   Capybara.server = :puma, { Silent: true }
 end
