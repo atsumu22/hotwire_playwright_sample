@@ -3,6 +3,8 @@ require "rails_helper"
 RSpec.describe "Tasks", type: :system do
   let!(:project1) { FactoryBot.create(:project, name: "最初のプロジェクト") }
   let!(:project2) { FactoryBot.create(:project, name: "2番目のプロジェクト") }
+  let!(:project1_task_a) { FactoryBot.create(:task, title: "sample task1", project: project1) }
+  let!(:project1_task_b) { FactoryBot.create(:task, title: "sample task2", project: project1) }
 
   it "プロジェクト詳細画面が表示されること" do
     visit project_path(project1.id)
@@ -82,8 +84,72 @@ RSpec.describe "Tasks", type: :system do
     end
   end
 
-  desctibe "タスク修正" do
-    it "既存タスクの修正ができること" do
+  describe "タスク修正" do
+    it "既存タスクの修正ができること", js: true do
+      visit project_path(project1.id)
+      original_task_name = find("turbo-frame#task_#{project1_task_a.id}").text
+
+      within("turbo-frame#task_#{project1_task_a.id}") do
+        expect(page).to have_selector("a", text: "編集")
+        click_on "編集"
+      end
+
+      expect(page).to have_selector('[data-modal-target="modal"]')
+      expect(page).to have_selector('[data-modal-target="content"]')
+
+      within('[data-modal-target="content"]') do
+        fill_in "タスク名", with: "更新したタスク名"
+        click_on "更新する"
+      end
+      expect(project1_task_a.title).not_to eq(original_task_name)
+      expect(page).to have_content("更新したタスク名")
     end
+
+    it "既存タスクの修正をやめられること", js: true do
+      visit project_path(project1.id)
+      original_task_name = find("turbo-frame#task_#{project1_task_a.id} p").text
+
+      within("turbo-frame#task_#{project1_task_a.id}") do
+        expect(page).to have_selector("a", text: "編集")
+        click_on "編集"
+      end
+
+      expect(page).to have_selector('[data-modal-target="modal"]')
+      expect(page).to have_selector('[data-modal-target="content"]')
+
+      within('[data-modal-target="content"]') do
+        fill_in "タスク名", with: "更新したタスク名"
+        click_on "やめる"
+      end
+      expect(project1_task_a.title).to eq(original_task_name)
+      expect(page).not_to have_content("更新したタスク名")
+    end
+
+    it "1つのモーダルを開いている間は別のモーダルは開けないこと", js: true do
+      visit project_path(project1.id)
+      expect(page).to have_selector("turbo-frame#task_#{project1_task_a.id}")
+      expect(page).to have_selector("turbo-frame#task_#{project1_task_b.id}")
+
+      within("turbo-frame#task_#{project1_task_a.id}") do
+        expect(page).to have_selector("a", text: "編集")
+        click_on "編集"
+      end
+
+      expect(page).to have_selector('[data-modal-target="modal"]')
+      expect(page).to have_selector('[data-modal-target="content"]')
+
+      within("turbo-frame#task_#{project1_task_b.id}") do
+        expect(page).to have_selector("a", text: "編集")
+        expect { click_on "編集" }.to raise_error(Capybara::Cuprite::MouseEventFailed)
+      end
+    end
+  end
+
+  describe "タスク削除" do
+    
+  end
+
+  describe "タスク完了" do
+    
   end
 end
