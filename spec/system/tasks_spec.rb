@@ -146,10 +146,106 @@ RSpec.describe "Tasks", type: :system do
   end
 
   describe "タスク削除" do
-    
+    it "タスクを削除できること", js: true do
+      visit project_path(project1.id)
+      expect(page).to have_selector("turbo-frame#task_#{project1_task_a.id}")
+      expect(page).to have_selector("turbo-frame#task_#{project1_task_b.id}")
+
+      expect{
+        within("turbo-frame#task_#{project1_task_a.id}") do
+          accept_confirm("本当に削除しますか？") do
+            click_on "削除"
+          end
+        end
+      }.to change(Task, :count).by(-1)
+
+      expect(page).not_to have_content(project1_task_a.title)
+    end
+
+    it "タスクの削除を中止できること", js: true do
+      visit project_path(project1.id)
+      expect(page).to have_selector("turbo-frame#task_#{project1_task_a.id}")
+      expect(page).to have_selector("turbo-frame#task_#{project1_task_b.id}")
+
+      expect{
+        within("turbo-frame#task_#{project1_task_a.id}") do
+          dismiss_confirm("本当に削除しますか？") do
+            click_on "削除"
+          end
+        end
+      }.to change(Task, :count).by(0)
+
+      expect(page).to have_content(project1_task_a.title)
+    end
   end
 
   describe "タスク完了" do
+    it "チェックボックスクリックでタスクが完了状態にできること", js: true do
+      visit project_path(project1.id)
+      expect(page).to have_selector("turbo-frame#task_#{project1_task_a.id}")
+      expect(page).to have_selector("turbo-frame#task_#{project1_task_b.id}")
     
+      within("turbo-frame#task_#{project1_task_a.id}") do
+        # カスタムチェックボックスのラベル部分をクリック
+        find('label').click
+      end
+    
+      # Turbo Frameの更新を待つ
+      expect(page).to have_selector("turbo-frame#task_#{project1_task_a.id} .bg-green-100")
+    
+      within("turbo-frame#task_#{project1_task_a.id}") do
+        expect(page).to have_content('Done')
+      end
+    
+      expect(project1_task_a.reload.status).to be true
+    end
+
+    it "完了状態のタスクのチェックボックスクリックでタスクが未完了にできること", js: true do
+      visit project_path(project1.id)
+      expect(page).to have_selector("turbo-frame#task_#{project1_task_a.id}")
+      expect(page).to have_selector("turbo-frame#task_#{project1_task_b.id}")
+    
+      within("turbo-frame#task_#{project1_task_a.id}") do
+        # カスタムチェックボックスのラベル部分をクリック
+        find('label').click
+      end
+      # Turbo Frameの更新を待つ
+      expect(page).to have_selector("turbo-frame#task_#{project1_task_a.id} .bg-green-100")
+      within("turbo-frame#task_#{project1_task_a.id}") do
+        expect(page).to have_content('Done')
+      end
+
+      within("turbo-frame#task_#{project1_task_a.id}") do
+        # カスタムチェックボックスのラベル部分をクリック
+        find('label').click
+      end
+
+      expect(page).to have_selector("turbo-frame#task_#{project1_task_a.id}")
+      within("turbo-frame#task_#{project1_task_a.id}") do
+        expect(page).not_to have_content('Done')
+      end
+      expect(project1_task_a.reload.status).to be false
+    end
+
+    it "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること、また全て完了にするボタンは非表示になること", js: true do
+      visit project_path(project1.id)
+      expect(page).to have_selector("button", text: "すべて完了にする")
+      
+      within("#all-complete") do
+        click_on "すべて完了にする"
+      end
+      
+      # ボタンが消えるまで待つ（処理完了の指標として使用）
+      expect(page).not_to have_selector("button", text: "すべて完了にする", wait: 6)
+      
+      # 各タスクに"Done"が表示されることを確認
+      within("#project-tasks") do
+        expect(page).to have_content("Done", count: 2, wait: 1)
+      end
+      
+      # データベースの状態確認
+      expect(project1_task_a.reload.status).to be true
+      expect(project1_task_b.reload.status).to be true
+    end
   end
 end
