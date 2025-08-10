@@ -14,6 +14,11 @@ export default class extends Controller {
 
   // --- モーダルを開くアクション ---
   open(event) {
+    // すでにモーダルが開いている場合は、新しいモーダルを開かない
+    if (!this.modalTarget.classList.contains("hidden")) {
+      return;
+    }
+
     const title = event.currentTarget.dataset.modalTitle || 'モーダルのタイトル';
     this.titleTarget.textContent = title;
     this.modalTarget.classList.remove("hidden");

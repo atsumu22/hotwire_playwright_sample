@@ -3,7 +3,7 @@
 
     <div class="flex items-center justify-start">
       <div>
-        <%= form.label "タスク名", style: "display: block", class: "#{'text-red-500' if task.errors[:title].any?}" %>
+        <%= form.label :title, "タスク名", style: "display: block", class: "#{'text-red-500' if task.errors[:title].any?}" %>
         <% task.errors[:title].each do |msg| %>
           <div class="text-red-500 text-sm mt-1"><%= msg %></div>
         <% end %>
@@ -11,7 +11,7 @@
       </div>
 
       <div>
-        <%= form.label "優先度", style: "display: block" %>
+        <%= form.label :sort_order, "優先度", style: "display: block" %>
         <%= form.number_field :sort_order, class: "bg-white my-2 me-4 px-4 py-2 border border-gray-300 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400" %>
       </div>
     </div>

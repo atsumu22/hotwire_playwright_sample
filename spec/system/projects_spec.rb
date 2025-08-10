@@ -68,15 +68,19 @@ RSpec.describe "Projects", type: :system do
   describe "プロジェクト新規登録" do
     it "プロジェクトを追加できること", js: true do
       visit projects_path
+
+      expect(page).to have_selector("a", text: "プロジェクトを追加する")
       click_on "プロジェクトを追加する"
       # 数秒待つことで、turbo-frameによって確実に入力フォームが現れたことを保証する。
       expect(page).to have_selector("turbo-frame#new_project", wait: 10)
 
       # new_projectのturbo-frame内のボタンであることを保証している。例えばページの別の箇所に同じ表記のぼたんがあるとエラーになる可能性がある。
-      within("#new_project") do
-        fill_in "project_name", with: "新しいプロジェクト"
-        click_on "登録する"
-      end
+      expect{
+        within("#new_project") do
+          fill_in "project_name", with: "新しいプロジェクト"
+          click_on "登録する"
+        end
+      }.to change(Project, :count).by(1)
 
       expect(page).to have_content("新しいプロジェクト")
       expect(page).to have_content("プロジェクトを登録しました")
@@ -259,6 +263,34 @@ RSpec.describe "Projects", type: :system do
       expect(find("turbo-frame#project_3 h3")).to have_content("新しいプロジェクト")
       expect(find("turbo-frame#project_#{project1.id} h3").text).not_to eq original_project1_name
       expect(find("turbo-frame#project_#{project1.id} h3").text).to eq "新しいプロジェクト名1"
+    end
+  end
+
+  describe "プロジェクト削除" do
+    it "プロジェクトを削除できること", js: true do
+      visit projects_path
+      expect{
+        within("turbo-frame#project_#{project1.id}") do
+          accept_confirm("本当に削除しますか？") do
+            click_on "削除"
+          end
+        end
+      }.to change(Project, :count).by(-1)
+
+      expect(page).not_to have_content(project1.name)
+    end
+
+    it "プロジェクトを削除を中止できること", js: true do
+      visit projects_path
+      expect{
+        within("turbo-frame#project_#{project1.id}") do
+          dismiss_confirm("本当に削除しますか？") do
+            click_on "削除"
+          end
+        end
+      }.to change(Project, :count).by(0)
+
+      expect(page).to have_content(project1.name)
     end
   end
 end
