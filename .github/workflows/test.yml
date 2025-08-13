@@ -73,6 +73,34 @@ jobs:
           find tmp/capybara -name "*.png" | head -10 || echo "スクリーンショットなし"
         continue-on-error: true
 
+      - name: Run Flaky Test Detection (Capybara)
+        run: |
+          echo "=== フレキーテスト検出開始 ==="
+          success=0
+          total=10
+          
+          for i in $(seq 1 $total); do
+            echo "=== Capybara実行 $i 回目 ==="
+            if timeout 90 bundle exec rspec spec/system/tasks_spec.rb -e "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること"; then
+              success=$((success + 1))
+              echo "✅ $i 回目: 成功"
+            else
+              echo "❌ $i 回目: 失敗"
+            fi
+          done
+          
+          failure=$((total - success))
+          failure_rate=$(( failure * 100 / total ))
+          echo "=== フレキーテスト結果 ==="
+          echo "成功: $success/$total"
+          echo "失敗: $failure/$total"
+          echo "失敗率: $failure_rate%"
+          
+          # CSVファイルに記録
+          echo "テスト名,実行回数,成功,失敗,失敗率" > flaky_test_results.csv
+          echo "すべて完了にする,$total,$success,$failure,$failure_rate%" >> flaky_test_results.csv
+        continue-on-error: true
+
       - name: Upload Flaky Test Results
         if: always()
         uses: actions/upload-artifact@v4
