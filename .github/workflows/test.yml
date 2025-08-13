@@ -10,7 +10,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     env:
       RAILS_ENV: test
       DATABASE_URL: sqlite3:db/test.sqlite3
@@ -29,6 +29,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+
+      - name: Install Playwright
+        run: |
+          npm install playwright
+          npx playwright install --with-deps
 
       - name: Setup Database
         run: |
@@ -189,11 +194,6 @@ jobs:
           
           echo "🏁 フレキーテスト分析完了"
         continue-on-error: true
-
-      - name: Install Playwright
-        run: |
-          npm install playwright
-          npx playwright install --with-deps
 
       - name: Playwright Flaky Test Analysis
         run: |
