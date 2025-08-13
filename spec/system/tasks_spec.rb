@@ -82,6 +82,32 @@ RSpec.describe "Tasks", type: :system do
 
       expect(page).not_to have_content("新しいタスク")
     end
+
+    it "新規タスクがproject-tasks内に正しく追加されること", js: true do
+      visit project_path(project1.id)
+      expect(page).not_to have_selector('[data-modal-target="modal"]')
+      expect(page).to have_selector("a", text: "タスクを追加する")
+
+      click_on "タスクを追加する"
+
+      expect(page).to have_selector('[data-modal-target="modal"]')
+      expect(page).to have_selector('[data-modal-target="content"]')
+
+      expect{
+        within('[data-modal-target="content"]') do
+          fill_in "タスク名", with: "テスト追加タスク"
+          click_on "登録する"
+        end
+      }.to change(Task, :count).by(1)
+      # # project-tasks内に追加されていることを確認
+      within("#project-tasks") do
+        expect(page).to have_content("テスト追加タスク")
+      end
+
+      # # project-tasks外に重複していないことを確認
+      outside_project_tasks = page.all("#project-tasks ~ *", text: "テスト追加タスク")
+      expect(outside_project_tasks).to be_empty
+    end
   end
 
   describe "タスク修正" do
