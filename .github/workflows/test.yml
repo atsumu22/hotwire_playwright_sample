@@ -10,7 +10,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    
     env:
       RAILS_ENV: test
       DATABASE_URL: sqlite3:db/test.sqlite3
@@ -40,17 +40,36 @@ jobs:
         run: bundle exec rspec
         continue-on-error: true
 
-      - name: Run RSpec tests and identify failures
+      - name: Run RSpec tests and capture failures
         run: |
-          # 失敗したテストを記録
-          bundle exec rspec --format json --out rspec_results.json
+          echo "🔍 失敗したテストを分析中..."
           
-          # 失敗したテストの名前を抽出
-          ruby -rjson -e "
-            data = JSON.parse(File.read('rspec_results.json'))
-            failures = data['examples'].select { |ex| ex['status'] == 'failed' }
-            File.write('failed_tests.txt', failures.map { |f| f['full_description'] }.join(\"\n\"))
-          "
+          # RSpecを再実行してJSONで結果を出力（失敗してもcontinue）
+          bundle exec rspec --format json --out rspec_results.json || true
+          
+          # JSONファイルが存在するかチェック
+          if [ -f rspec_results.json ]; then
+            echo "✅ RSpec結果ファイル生成成功"
+            
+            # 失敗したテストを抽出
+            ruby -rjson -e "
+              data = JSON.parse(File.read('rspec_results.json'))
+              failures = data['examples'].select { |ex| ex['status'] == 'failed' }
+              if failures.any?
+                puts '失敗したテスト数: ' + failures.size.to_s
+                File.write('failed_tests.txt', failures.map { |f| f['full_description'] }.join(\"\n\"))
+                puts '失敗テストリスト:'
+                failures.each { |f| puts '- ' + f['full_description'] }
+              else
+                puts '失敗したテストはありません'
+                File.write('failed_tests.txt', '')
+              end
+            "
+          else
+            echo "❌ RSpec結果ファイルが生成されませんでした"
+            echo "既知の失敗テストで代替実行します"
+            touch failed_tests.txt
+          fi
         continue-on-error: true
 
       - name: Flaky Test Analysis for Failed Tests
@@ -59,11 +78,70 @@ jobs:
           echo "🧪 フレキーテスト チェック開始"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
-          if [ ! -f failed_tests.txt ]; then
-            echo "🎉 失敗したテストがありません！"
+          # ファイルの存在と内容をチェック
+          if [ ! -f failed_tests.txt ] || [ ! -s failed_tests.txt ]; then
+            echo "📝 failed_tests.txt が存在しないか空です"
+            echo "🔍 既知の失敗テストで分析を実行します"
+            echo ""
+            
+            # 前回のCI結果から既知の失敗テストを指定
+            failed_tests=(
+              "タスク追加ボタンをクリックすると、モーダルが現れること"
+              "タスク追加モーダルから新しくタスクを追加できること"
+              "タスクの追加を中止できること"
+              "新規タスクがproject-tasks内に正しく追加されること"
+              "1つのモーダルを開いている間は別のモーダルは開けないこと"
+              "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること、また全て完了にするボタンは非表示になること"
+            )
+            
+            for test_name in "${failed_tests[@]}"; do
+              echo "📊 対象: $test_name"
+              echo ""
+              
+              success=0
+              runs=5  # 時間節約のため5回
+              start_time=$(date +%s)
+              
+              printf "実行状況: "
+              for i in $(seq 1 $runs); do
+                if timeout 90 bundle exec rspec spec/system/tasks_spec.rb -e "$test_name" >/dev/null 2>&1; then
+                  success=$((success + 1))
+                  printf "✅"
+                else
+                  printf "❌"
+                fi
+                printf " "
+              done
+              
+              end_time=$(date +%s)
+              total_time=$((end_time - start_time))
+              success_rate=$((success * 100 / runs))
+              
+              echo ""
+              echo ""
+              echo "📈 結果サマリー:"
+              echo "   ✅ 成功: $success回/$runs回"
+              echo "   📊 成功率: $success_rate%"
+              echo "   ⏱️  実行時間: ${total_time}s"
+              echo ""
+              
+              if [ $success_rate -ge 90 ]; then
+                echo "🎉 判定: 安定 (偶発的失敗)"
+              elif [ $success_rate -ge 70 ]; then
+                echo "⚠️  判定: 軽微なフレキー"
+              else
+                echo "🚨 判定: 高フレキー (要対処)"
+              fi
+              
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo ""
+            done
+            
+            echo "🏁 フレキーテスト分析完了"
             exit 0
           fi
           
+          echo "📝 失敗テストファイルから読み込み中..."
           while IFS= read -r test_name; do
             [ -z "$test_name" ] && continue
             
@@ -71,7 +149,7 @@ jobs:
             echo ""
             
             success=0
-            runs=10
+            runs=5
             start_time=$(date +%s)
             
             printf "実行状況: "
@@ -88,15 +166,12 @@ jobs:
             end_time=$(date +%s)
             total_time=$((end_time - start_time))
             success_rate=$((success * 100 / runs))
-            failure_rate=$((100 - success_rate))
             
             echo ""
             echo ""
             echo "📈 結果サマリー:"
             echo "   ✅ 成功: $success回/$runs回"
-            echo "   ❌ 失敗: $((runs - success))回/$runs回"
             echo "   📊 成功率: $success_rate%"
-            echo "   📊 失敗率: $failure_rate%"
             echo "   ⏱️  実行時間: ${total_time}s"
             echo ""
             
@@ -111,5 +186,6 @@ jobs:
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo ""
           done < failed_tests.txt
+          
+          echo "🏁 フレキーテスト分析完了"
         continue-on-error: true
-        
