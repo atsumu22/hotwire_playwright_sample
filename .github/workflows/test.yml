@@ -109,17 +109,5 @@ jobs:
           path: flaky_test_results.csv
 
       - name: Run RSpec tests
-        run: bundle exec RSpec
+        run: bundle exec rspec
         continue-on-error: true
-
-      - name: Run Flaky Test Detection (Capybara)
-        run: |
-          success=0
-          total=10
-          for i in $(seq 1 $total); do
-            echo "=== Capybara実行 $i 回目 ==="
-            if bundle exec rspec spec/system/tasks_spec.rb; then
-              success=$((success + 1))
-            fi
-          done
-          echo "成功率: $success/$total"
