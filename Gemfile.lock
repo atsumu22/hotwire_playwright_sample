@@ -163,6 +163,10 @@ GEM
       net-smtp
     marcel (1.0.4)
     matrix (0.4.3)
+    mime-types (3.7.0)
+      logger
+      mime-types-data (~> 3.2025, >= 3.2025.0507)
+    mime-types-data (3.2025.0812)
     mini_mime (1.1.5)
     minitest (5.25.5)
     net-imap (0.5.9)
@@ -191,6 +195,9 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.8-x86_64-linux-musl)
       racc (~> 1.4)
+    playwright-ruby-client (1.54.1)
+      concurrent-ruby (>= 1.1.6)
+      mime-types (>= 3.0)
     pp (0.6.2)
       prettyprint
     prettyprint (0.2.0)
@@ -340,6 +347,7 @@ DEPENDENCIES
   factory_bot_rails
   importmap-rails
   kaminari
+  playwright-ruby-client
   propshaft
   puma (>= 5.0)
   rails (~> 8.0.1)
