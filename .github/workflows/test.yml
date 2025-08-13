@@ -36,77 +36,58 @@ jobs:
           bundle exec rails db:create
           bundle exec rails db:migrate
 
-      - name: Run Individual Test Analysis
+      - name: Simple Flaky Test Check
         run: |
-          echo "=== 個別テスト分析開始 ==="
+          echo ""
+          echo "🧪 フレキーテスト チェック開始"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # 最もフレキーなテストのみ集中分析
+          test_name="すべて完了にするボタンで一定時間待機後全タスクが完了状態になること"
+          echo "📊 対象: $test_name"
+          echo ""
           
           success=0
-          total=0
+          runs=10
+          start_time=$(date +%s)
           
-          tests=(
-            "プロジェクト詳細画面が表示されること"
-            "タスク追加ボタンをクリックすると、モーダルが現れること"
-            "チェックボックスクリックでタスクが完了状態にできること"
-            "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること"
-          )
-          
-          for test in "${tests[@]}"; do
-            total=$((total + 1))
-            echo "--- テスト: $test ---"
-            if timeout 60 bundle exec rspec spec/system/tasks_spec.rb -e "$test"; then
-              echo "✅ 成功"
+          printf "実行状況: "
+          for i in $(seq 1 $runs); do
+            if timeout 90 bundle exec rspec spec/system/tasks_spec.rb -e "$test_name" >/dev/null 2>&1; then
               success=$((success + 1))
+              printf "✅"
             else
-              echo "❌ 失敗"
+              printf "❌"
             fi
+            printf " "
           done
           
-          echo "=== 結果サマリー ==="
-          echo "成功: $success/$total"
-          echo "失敗率: $(( (total - success) * 100 / total ))%"
+          end_time=$(date +%s)
+          total_time=$((end_time - start_time))
+          success_rate=$((success * 100 / runs))
+          failure_rate=$((100 - success_rate))
+          
+          echo ""
+          echo ""
+          echo "📈 結果サマリー:"
+          echo "   ✅ 成功: $success回/$runs回"
+          echo "   ❌ 失敗: $((runs - success))回/$runs回"
+          echo "   📊 成功率: $success_rate%"
+          echo "   📊 失敗率: $failure_rate%"
+          echo "   ⏱️  実行時間: ${total_time}s"
+          echo ""
+          
+          if [ $success_rate -ge 90 ]; then
+            echo "🎉 判定: 安定 (フレキーテストではない)"
+          elif [ $success_rate -ge 70 ]; then
+            echo "⚠️  判定: 軽微なフレキー"
+          else
+            echo "🚨 判定: 高フレキー (要対処)"
+          fi
+          
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         continue-on-error: true
 
-      - name: Collect Failure Screenshots
-        if: always()
-        run: |
-          echo "スクリーンショット一覧:"
-          find tmp/capybara -name "*.png" | head -10 || echo "スクリーンショットなし"
-        continue-on-error: true
-
-      - name: Run Flaky Test Detection (Capybara)
-        run: |
-          echo "=== フレキーテスト検出開始 ==="
-          success=0
-          total=10
-          
-          for i in $(seq 1 $total); do
-            echo "=== Capybara実行 $i 回目 ==="
-            if timeout 90 bundle exec rspec spec/system/tasks_spec.rb -e "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること"; then
-              success=$((success + 1))
-              echo "✅ $i 回目: 成功"
-            else
-              echo "❌ $i 回目: 失敗"
-            fi
-          done
-          
-          failure=$((total - success))
-          failure_rate=$(( failure * 100 / total ))
-          echo "=== フレキーテスト結果 ==="
-          echo "成功: $success/$total"
-          echo "失敗: $failure/$total"
-          echo "失敗率: $failure_rate%"
-          
-          # CSVファイルに記録
-          echo "テスト名,実行回数,成功,失敗,失敗率" > flaky_test_results.csv
-          echo "すべて完了にする,$total,$success,$failure,$failure_rate%" >> flaky_test_results.csv
-        continue-on-error: true
-
-      - name: Upload Flaky Test Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: flaky-test-results
-          path: flaky_test_results.csv
 
       - name: Run RSpec tests
         run: bundle exec rspec
