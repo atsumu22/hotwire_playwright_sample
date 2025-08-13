@@ -13,6 +13,7 @@ jobs:
 
     env:
       RAILS_ENV: test
+      DATABASE_URL: sqlite3:db/test.sqlite3
 
     steps:
       - name: Checkout code
@@ -31,6 +32,7 @@ jobs:
 
       - name: Setup Database
         run: |
+          mkdir -p db
           bundle exec rails db:create
           bundle exec rails db:migrate
 
