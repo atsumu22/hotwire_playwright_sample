@@ -189,3 +189,79 @@ jobs:
           
           echo "🏁 フレキーテスト分析完了"
         continue-on-error: true
+
+      - name: Install Playwright
+        run: |
+          npm install playwright
+          npx playwright install --with-deps
+
+      - name: Playwright Flaky Test Analysis
+        run: |
+          echo ""
+          echo "🚀 Playwrightフレキーテスト チェック開始"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # 前回Capybaraで失敗したテストと同じものをPlaywrightで実行
+          failed_tests=(
+            "タスク追加ボタンをクリックすると、モーダルが現れること"
+            "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること"
+          )
+          
+          for test_name in "${failed_tests[@]}"; do
+            echo "📊 対象: $test_name"
+            echo ""
+            
+            success=0
+            runs=5
+            start_time=$(date +%s)
+            
+            printf "実行状況: "
+            for i in $(seq 1 $runs); do
+              if timeout 90 bundle exec rspec spec/playwright/tasks_spec.rb -e "$test_name" >/dev/null 2>&1; then
+                success=$((success + 1))
+                printf "✅"
+              else
+                printf "❌"
+              fi
+              printf " "
+            done
+            
+            end_time=$(date +%s)
+            total_time=$((end_time - start_time))
+            success_rate=$((success * 100 / runs))
+            
+            echo ""
+            echo ""
+            echo "📈 結果サマリー:"
+            echo "   ✅ 成功: $success回/$runs回"
+            echo "   📊 成功率: $success_rate%"
+            echo "   ⏱️  実行時間: ${total_time}s"
+            echo ""
+            
+            if [ $success_rate -ge 90 ]; then
+              echo "🎉 判定: 安定"
+            elif [ $success_rate -ge 70 ]; then
+              echo "⚠️  判定: 軽微なフレキー"
+            else
+              echo "🚨 判定: 高フレキー"
+            fi
+            
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo ""
+          done
+          
+          echo "🏁 Playwrightフレキーテスト分析完了"
+        continue-on-error: true
+
+      - name: Comparison Summary
+        run: |
+          echo ""
+          echo "📊 ==============================================="
+          echo "     Capybara vs Playwright 比較サマリー"
+          echo "==============================================="
+          echo "🔍 詳細は上記のログを確認してください"
+          echo "📝 期待される結果:"
+          echo "   - Capybara: 不安定（失敗率が高い）"
+          echo "   - Playwright: 安定（成功率が高い）"
+          echo "==============================================="
+        continue-on-error: true
