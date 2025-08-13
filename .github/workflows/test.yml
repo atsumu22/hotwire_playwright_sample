@@ -75,7 +75,7 @@ jobs:
 
       - name: Upload Flaky Test Results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: flaky-test-results
           path: flaky_test_results.csv
