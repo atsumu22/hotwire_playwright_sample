@@ -10,7 +10,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     env:
       RAILS_ENV: test
       DATABASE_URL: sqlite3:db/test.sqlite3
@@ -30,28 +30,30 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Install Playwright
+        run: |
+          npm install playwright
+          npx playwright install --with-deps
+
       - name: Setup Database
         run: |
           mkdir -p db
           bundle exec rails db:create
           bundle exec rails db:migrate
 
-      - name: Run RSpec tests
-        run: bundle exec rspec
-        continue-on-error: true
-
       - name: Run RSpec tests and capture failures
         run: |
-          echo "🔍 失敗したテストを分析中..."
+          echo "🧪 RSpecテスト実行 & 失敗テスト分析"
           
-          # RSpecを再実行してJSONで結果を出力（失敗してもcontinue）
+          # 1回のテスト実行で両方の目的を達成
           bundle exec rspec --format json --out rspec_results.json || true
           
-          # JSONファイルが存在するかチェック
+          # 通常の出力も表示（見やすさのため）
+          bundle exec rspec --format documentation || true
+          
+          # 失敗したテストを抽出
           if [ -f rspec_results.json ]; then
-            echo "✅ RSpec結果ファイル生成成功"
-            
-            # 失敗したテストを抽出
+            echo "✅ テスト結果の分析中..."
             ruby -rjson -e "
               data = JSON.parse(File.read('rspec_results.json'))
               failures = data['examples'].select { |ex| ex['status'] == 'failed' }
@@ -61,18 +63,14 @@ jobs:
                 puts '失敗テストリスト:'
                 failures.each { |f| puts '- ' + f['full_description'] }
               else
-                puts '失敗したテストはありません'
+                puts '🎉 すべてのテストが成功しました！'
                 File.write('failed_tests.txt', '')
               end
             "
-          else
-            echo "❌ RSpec結果ファイルが生成されませんでした"
-            echo "既知の失敗テストで代替実行します"
-            touch failed_tests.txt
           fi
         continue-on-error: true
 
-      - name: Flaky Test Analysis for Failed Tests
+      - name: Cuprite Flaky Test Analysis
         run: |
           echo ""
           echo "🧪 フレキーテスト チェック開始"
@@ -188,4 +186,75 @@ jobs:
           done < failed_tests.txt
           
           echo "🏁 フレキーテスト分析完了"
+        continue-on-error: true
+
+      - name: Playwright Flaky Test Analysis
+        run: |
+          echo ""
+          echo "🚀 Playwrightフレキーテスト チェック開始"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # 前回Capybaraで失敗したテストと同じものをPlaywrightで実行
+          failed_tests=(
+            "タスク追加ボタンをクリックすると、モーダルが現れること"
+            "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること"
+          )
+          
+          for test_name in "${failed_tests[@]}"; do
+            echo "📊 対象: $test_name"
+            echo ""
+            
+            success=0
+            runs=5
+            start_time=$(date +%s)
+            
+            printf "実行状況: "
+            for i in $(seq 1 $runs); do
+              if timeout 90 bundle exec rspec spec/playwright/tasks_spec.rb -e "$test_name" >/dev/null 2>&1; then
+                success=$((success + 1))
+                printf "✅"
+              else
+                printf "❌"
+              fi
+              printf " "
+            done
+            
+            end_time=$(date +%s)
+            total_time=$((end_time - start_time))
+            success_rate=$((success * 100 / runs))
+            
+            echo ""
+            echo ""
+            echo "📈 結果サマリー:"
+            echo "   ✅ 成功: $success回/$runs回"
+            echo "   📊 成功率: $success_rate%"
+            echo "   ⏱️  実行時間: ${total_time}s"
+            echo ""
+            
+            if [ $success_rate -ge 90 ]; then
+              echo "🎉 判定: 安定"
+            elif [ $success_rate -ge 70 ]; then
+              echo "⚠️  判定: 軽微なフレキー"
+            else
+              echo "🚨 判定: 高フレキー"
+            fi
+            
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo ""
+          done
+          
+          echo "🏁 Playwrightフレキーテスト分析完了"
+        continue-on-error: true
+
+      - name: Comparison Summary
+        run: |
+          echo ""
+          echo "📊 ==============================================="
+          echo "     Capybara vs Playwright 比較サマリー"
+          echo "==============================================="
+          echo "🔍 詳細は上記のログを確認してください"
+          echo "📝 期待される結果:"
+          echo "   - Capybara: 不安定（失敗率が高い）"
+          echo "   - Playwright: 安定（成功率が高い）"
+          echo "==============================================="
         continue-on-error: true
