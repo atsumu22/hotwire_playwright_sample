@@ -18,13 +18,17 @@ RSpec.describe "Tasks with Playwright", type: :system, playwright: true do
 
   it "【Playwright】すべて完了にするボタンで一定時間待機後全タスクが完了状態になること" do
     visit "/projects/#{project1.id}"
+
+    expect(page).to have_button("すべて完了にする")
+    overlay = page.find('[data-complete-all-target="overlay"]', visible: false)
+    expect(overlay[:class]).to include('hidden')
     
-    expect(page).to have_selector("button", text: "すべて完了にする")
     click_button "すべて完了にする"
-    
-    # Playwrightでの安定した待機
-    expect(page).not_to have_selector("button", text: "すべて完了にする", wait: 6)
-    
+
+    expect(page).to have_selector('[data-complete-all-target="overlay"]', visible: true, wait: 3)
+
+    expect(page).to have_selector('[data-complete-all-target="overlay"]', visible: false, wait: 15)
+    expect(page).to have_selector('.bg-green-100', count: 2)
     expect(project1_task_a.reload.status).to be true
     expect(project1_task_b.reload.status).to be true
   end
