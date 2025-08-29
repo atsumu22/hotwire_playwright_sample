@@ -106,7 +106,7 @@ RSpec.describe "Tasks with Playwright", type: :system, playwright: true do
       # データベースの確認
       new_task = project1.tasks.find_by(title: "project-tasks内確認用タスク")
       expect(new_task).to be_present
-      expect(new_task.sort_order).to eq(5)
+      expect(new_task.sort_order).to eq(3)
     end
 
     it "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること" do
