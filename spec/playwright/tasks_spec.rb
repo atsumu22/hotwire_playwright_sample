@@ -10,73 +10,78 @@ RSpec.describe "Tasks with Playwright", type: :system, playwright: true do
     it "タスク追加ボタンをクリックすると、モーダルが現れること" do
       visit "/projects/#{project1.id}"
       
+      expect(page).not_to have_selector('[data-modal-target="modal"]')
       expect(page).to have_selector("a", text: "タスクを追加する")
+      
       click_on "タスクを追加する"
       
       expect(page).to have_selector('[data-modal-target="modal"]')
       expect(page).to have_selector('[data-modal-target="content"]')
+    
+      within('[data-modal-target="content"]') do
+        expect(page).to have_content("タスクを登録する")
+        expect(page).to have_field("タスク名")
+        expect(page).to have_field("優先度")
+        expect(page).to have_button("登録する")
+        expect(page).to have_button("やめる")
+      end
     end
 
-    it "【Playwright】タスク追加モーダルから新しくタスクを追加できること" do
+    it "タスク追加モーダルから新しくタスクを追加できること" do
       visit "/projects/#{project1.id}"
       
-      # モーダルを開く
-      click_on "タスクを追加する"
-      expect(page).to have_selector('[data-modal-target="modal"]', visible: true)
+      initial_count = Task.count
+
+      expect(page).not_to have_selector('[data-modal-target="modal"]')
+      expect(page).to have_selector("a", text: "タスクを追加する")
       
-      # フォームに入力
+      click_on "タスクを追加する"
+      
+      expect(page).to have_selector('[data-modal-target="modal"]', visible: true)
+      expect(page).to have_selector('[data-modal-target="content"]')
+
       within('[data-modal-target="content"]') do
-        fill_in "task[title]", with: "新しいタスク"
-        fill_in "task[sort_order]", with: "10"
-        
-        click_button "登録する"
+        fill_in "タスク名", with: "新しいタスク"
+        click_on "登録する"
       end
       
-      # モーダルが閉じることを確認
       expect(page).to have_selector('[data-modal-target="modal"]', visible: false, wait: 5)
       
-      # 新しいタスクが追加されたことを確認
       within("#project-tasks") do
         expect(page).to have_content("新しいタスク")
       end
+      expect(page).to have_content("タスクを追加しました")
       
-      # データベースの確認
       new_task = project1.tasks.find_by(title: "新しいタスク")
       expect(new_task).to be_present
-      expect(new_task.sort_order).to eq(10)
+      expect(Task.count).to eq(initial_count + 1)
     end
 
-    it "【Playwright】タスクの追加を中止できること" do
+    it "タスクの追加を中止できること" do
       visit "/projects/#{project1.id}"
       
-      # 既存タスク数をカウント
       initial_task_count = page.all('#project-tasks [id^="task_"]').count
-      
-      # モーダルを開く
+
+      expect(page).not_to have_selector('[data-modal-target="modal"]')
+      expect(page).to have_selector("a", text: "タスクを追加する")
+
       click_on "タスクを追加する"
+
       expect(page).to have_selector('[data-modal-target="modal"]', visible: true)
-      
-      # フォームに入力（途中まで）
+      expect(page).to have_selector('[data-modal-target="content"]')
+
       within('[data-modal-target="content"]') do
-        fill_in "task[title]", with: "キャンセルするタスク"
-        fill_in "task[sort_order]", with: "99"
-        
-        # ×ボタンをクリック
-        click_button "×"
+        fill_in "タスク名", with: "キャンセルするタスク"
+        click_on "やめる"
       end
-      
-      # モーダルが閉じることを確認
+
       expect(page).to have_selector('[data-modal-target="modal"]', visible: false, wait: 5)
-      
-      # タスクが追加されていないことを確認
       expect(page.all('#project-tasks [id^="task_"]').count).to eq(initial_task_count)
       expect(page).not_to have_content("キャンセルするタスク")
-      
-      # データベースの確認
       expect(project1.tasks.find_by(title: "キャンセルするタスク")).to be_nil
     end
 
-    it "【Playwright】新規タスクがproject-tasks内に正しく追加されること" do
+    it "新規タスクがproject-tasks内に正しく追加されること" do
       visit "/projects/#{project1.id}"
       
       # モーダルを開いて新しいタスクを追加
@@ -84,9 +89,7 @@ RSpec.describe "Tasks with Playwright", type: :system, playwright: true do
       expect(page).to have_selector('[data-modal-target="modal"]', visible: true)
       
       within('[data-modal-target="content"]') do
-        fill_in "task[title]", with: "project-tasks内確認用タスク"
-        fill_in "task[sort_order]", with: "5"
-        
+        fill_in "タスク名", with: "project-tasks内確認用タスク"
         click_button "登録する"
       end
       
