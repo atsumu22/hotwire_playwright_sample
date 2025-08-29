@@ -25,7 +25,6 @@ group :development, :test do
   gem "factory_bot_rails"
   gem "cuprite"
   gem "capybara-screenshot"
-  gem 'capybara-playwright-driver'
 end
 
 gem "kaminari"
