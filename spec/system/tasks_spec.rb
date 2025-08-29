@@ -48,7 +48,7 @@ RSpec.describe "Tasks", type: :system do
 
       click_on "タスクを追加する"
 
-      expect(page).to have_selector('[data-modal-target="modal"]')
+      expect(page).to have_selector('[data-modal-target="modal"]', visible: true)
       expect(page).to have_selector('[data-modal-target="content"]')
 
       expect{
@@ -58,8 +58,15 @@ RSpec.describe "Tasks", type: :system do
         end
       }.to change(Task, :count).by(1)
 
-      expect(page).to have_content("新しいタスク")
+      expect(page).to have_selector('[data-modal-target="modal"]', visible: false, wait: 5)
+
+      within("#project-tasks") do
+        expect(page).to have_content("新しいタスク")
+      end
       expect(page).to have_content("タスクを追加しました")
+      
+      new_task = project1.tasks.find_by(title: "新しいタスク")
+      expect(new_task).to be_present
     end
 
     it "タスクの追加を中止できること", js: true do
@@ -70,17 +77,18 @@ RSpec.describe "Tasks", type: :system do
 
       click_on "タスクを追加する"
 
-      expect(page).to have_selector('[data-modal-target="modal"]')
+      expect(page).to have_selector('[data-modal-target="modal"]', visible: true)
       expect(page).to have_selector('[data-modal-target="content"]')
 
       expect{
         within('[data-modal-target="content"]') do
-          fill_in "タスク名", with: "新しいタスク"
+          fill_in "タスク名", with: "キャンセルするタスク"
           click_on "やめる"
         end
       }.to change(Task, :count).by(0)
 
-      expect(page).not_to have_content("新しいタスク")
+      expect(page).to have_selector('[data-modal-target="modal"]', visible: false, wait: 5)
+      expect(page).not_to have_content("キャンセルするタスク")
     end
 
     it "新規タスクがproject-tasks内に正しく追加されること", js: true do
@@ -90,7 +98,7 @@ RSpec.describe "Tasks", type: :system do
 
       click_on "タスクを追加する"
 
-      expect(page).to have_selector('[data-modal-target="modal"]')
+      expect(page).to have_selector('[data-modal-target="modal"]', visible: true)
       expect(page).to have_selector('[data-modal-target="content"]')
 
       expect{
