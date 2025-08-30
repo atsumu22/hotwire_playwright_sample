@@ -13,14 +13,12 @@
       <h3 class="text-xl font-semibold text-gray-800" id="modal-title" data-modal-target="title">
         <%= local_assigns[:title] || "モーダルのタイトル" %>
       </h3>
-      <%# 閉じるボタン - Stimulusアクションを呼び出す %>
       <button type="button" data-action="modal#close" class="text-gray-400 hover:text-gray-600 text-2xl">
         &times;
       </button>
     </div>
 
     <%= turbo_frame_tag "modal_content_frame" do %>
-      <%# このフレームが更新されるまで、初期表示は空にしておく %>
       <% if content_for?(:modal_content) %>
         <%= yield :modal_content %>
       <% end %>
