@@ -23,7 +23,6 @@ group :development, :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "factory_bot_rails"
-  gem "cuprite"
   gem "capybara-screenshot"
   gem 'capybara-playwright-driver'
 end

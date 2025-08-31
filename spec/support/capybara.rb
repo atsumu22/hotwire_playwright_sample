@@ -14,16 +14,7 @@ RSpec.configure do |config|
     driven_by(:rack_test)
   end
 
-  config.before(:each, type: :system, js: true) do
-    driven_by(:cuprite, screen_size: [1400, 1400], options: {
-      timeout: 30,
-      headless: true,
-    })
-  end
-
   config.before(:each, type: :system, playwright: true) do
     driven_by(:playwright, screen_size: [1400, 1400])
   end
-
-  Capybara.server = :puma, { Silent: true }
 end
