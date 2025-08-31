@@ -1,16 +1,30 @@
-# README
+# Hotwire Playwright Sample
 
-自由研究用アプリ
+CupriteとPlaywrightのシステムテスト比較検証用のサンプルアプリケーションです。
 
-# アプリ起動方法
+## セットアップ
+
 ```bash
+git clone https://github.com/atsumu22/hotwire_playwright_sample.git
+cd hotwire_playwright_sample
+
 bundle install
-bin/rails db:create db:migrate db:seed
-bin/dev
+rails db:create db:migrate db:seed
+
+# Playwright使用の場合のみ
+bundle exec playwright install chromium
 ```
 
-# テスト実行方法
+## テスト実行
+
+### Cupriteドライバ
 ```bash
-bundle exec rspec
+git checkout cuprite
+bundle exec rspec spec/system/
 ```
 
+### Playwrightドライバ
+```bash
+git checkout playwright  
+bundle exec rspec spec/playwright/
+```
