@@ -31,21 +31,23 @@ RSpec.describe "Tasks", type: :system do
     expect(page).not_to have_selector('[data-modal-target="modal"]')
     expect(page).to have_selector("a", text: "タスクを追加する")
 
+    initial_count = Task.count
+
     click_on "タスクを追加する"
 
     expect(page).to have_selector('[data-modal-target="modal"]', visible: true)
     expect(page).to have_selector('[data-modal-target="content"]')
 
-    expect{
-      within('[data-modal-target="content"]') do
-        fill_in "タスク名", with: "テスト追加タスク"
-        click_on "登録する"
-      end
-    }.to change(Task, :count).by(1)
+    within('[data-modal-target="content"]') do
+      fill_in "タスク名", with: "テスト追加タスク"
+      click_on "登録する"
+    end
 
     within("#project-tasks") do
       expect(page).to have_content("テスト追加タスク")
     end
+
+    expect(Task.count).to eq(initial_count + 1)
 
     outside_project_tasks = page.all("#project-tasks ~ *", text: "テスト追加タスク")
     expect(outside_project_tasks).to be_empty
