@@ -1,24 +1,16 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+自由研究用アプリ
 
-Things you may want to cover:
+# アプリ起動方法
+```bash
+bundle install
+bin/rails db:create db:migrate db:seed
+bin/dev
+```
 
-* Ruby version
+# テスト実行方法
+```bash
+bundle exec rspec
+```
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
