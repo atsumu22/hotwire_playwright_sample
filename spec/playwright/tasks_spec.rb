@@ -54,19 +54,36 @@ RSpec.describe "Tasks with Playwright", type: :system do
 
   it "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること", playwright: true do
     visit project_path(project1.id)
-    expect(page).to have_selector("button", text: "すべて完了にする")
 
-    within("#all-complete") do
-      click_on "すべて完了にする"
-    end
+    expect(page).to have_button("すべて完了にする")
+    overlay = page.find('[data-complete-all-target="overlay"]', visible: false)
+    expect(overlay[:class]).to include('hidden')
 
-    expect(page).not_to have_selector("button", text: "すべて完了にする", wait: 6)
+    click_button "すべて完了にする"
+    
+    expect(page).to have_selector('[data-complete-all-target="overlay"]', visible: true, wait: 3)
 
-    within("#project-tasks") do
-      expect(page).to have_content("Done", count: 2, wait: 1)
-    end
-
+    expect(page).to have_selector('[data-complete-all-target="overlay"]', visible: false, wait: 15)
+    expect(page).to have_selector('.bg-green-100', count: 2)
     expect(project1_task_a.reload.status).to be true
     expect(project1_task_b.reload.status).to be true
   end
+
+  # it "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること", playwright: true do
+  #   visit project_path(project1.id)
+  #   expect(page).to have_selector("button", text: "すべて完了にする")
+
+  #   within("#all-complete") do
+  #     click_on "すべて完了にする"
+  #   end
+
+  #   expect(page).not_to have_selector("button", text: "すべて完了にする", wait: 6)
+
+  #   within("#project-tasks") do
+  #     expect(page).to have_content("Done", count: 2, wait: 1)
+  #   end
+
+  #   expect(project1_task_a.reload.status).to be true
+  #   expect(project1_task_b.reload.status).to be true
+  # end
 end
