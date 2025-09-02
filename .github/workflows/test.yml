@@ -14,6 +14,8 @@ jobs:
     env:
       RAILS_ENV: test
       DATABASE_URL: sqlite3:db/test.sqlite3
+      CI: true
+      PLAYWRIGHT_TIMEOUT: 30000
 
     steps:
       - name: Checkout code
