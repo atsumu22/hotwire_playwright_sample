@@ -12,7 +12,7 @@ RSpec.describe "Projects", type: :system do
   end
 
   describe "検索フォーム" do
-    it "プロジェクトを検索できること", js: true do
+    it "プロジェクトを検索できること", playwright: true do
       visit projects_path
       fill_in "q_name_cont", with: "最初"
       expect(page).to have_field("q_name_cont", with: "最初")
@@ -21,7 +21,7 @@ RSpec.describe "Projects", type: :system do
       expect(page).not_to have_content("2番目のプロジェクト")
     end
 
-    it "クリアボタンで入力内容を消去できること", js: true do
+    it "クリアボタンで入力内容を消去できること", playwright: true do
       visit projects_path
       fill_in "q_name_cont", with: "最初"
       click_on "クリア"
@@ -31,15 +31,25 @@ RSpec.describe "Projects", type: :system do
   end
 
   describe "ソート機能" do
-    it "プロジェクト名でソートできること", js: true do
+    it "⭐️プロジェクト名でソートできること", playwright: true do
       visit projects_path
+
       click_on "プロジェクト名"
-      # Turbo Frameが更新されるのを待つ
+
+      # Turbo Frameの更新完了を待つ
+      sleep 0.5 # 短時間の待機でDOM更新を確実にする
+
+      # 要素を再取得する
+      expect(page).to have_selector(".project-item", count: 2, wait: 3)
       ordered_project_elements = all(".project-item")
       expect(ordered_project_elements[0]).to have_content("2番目のプロジェクト")
       expect(ordered_project_elements[1]).to have_content("最初のプロジェクト")
 
       click_on "プロジェクト名"
+
+      # 再度要素を取得
+      sleep 0.5
+      expect(page).to have_selector(".project-item", count: 2, wait: 3)
       reordered_project_elements = all(".project-item")
       expect(reordered_project_elements[0]).to have_content("最初のプロジェクト")
       expect(reordered_project_elements[1]).to have_content("2番目のプロジェクト")
@@ -66,27 +76,32 @@ RSpec.describe "Projects", type: :system do
 
 
   describe "プロジェクト新規登録" do
-    it "プロジェクトを追加できること", js: true do
+    it "⭐️プロジェクトを追加できること", playwright: true do
       visit projects_path
-
       expect(page).to have_selector("a", text: "プロジェクトを追加する")
+
+      initial_count = Project.count
+
       click_on "プロジェクトを追加する"
-      # 数秒待つことで、turbo-frameによって確実に入力フォームが現れたことを保証する。
+
       expect(page).to have_selector("turbo-frame#new_project", wait: 10)
 
-      # new_projectのturbo-frame内のボタンであることを保証している。例えばページの別の箇所に同じ表記のぼたんがあるとエラーになる可能性がある。
-      expect{
-        within("#new_project") do
-          fill_in "project_name", with: "新しいプロジェクト"
-          click_on "登録する"
-        end
-      }.to change(Project, :count).by(1)
+      within("#new_project") do
+        fill_in "project_name", with: "新しいプロジェクト"
+        click_on "登録する"
+      end
+
+      within("#projects") do
+        expect(page).to have_content("新しいプロジェクト")
+      end
+
+      expect(Project.count).to eq(initial_count + 1)
 
       expect(page).to have_content("新しいプロジェクト")
       expect(page).to have_content("プロジェクトを登録しました")
     end
 
-    it "プロジェクトの追加を途中でやめられること", js: true do
+    it "プロジェクトの追加を途中でやめられること", playwright: true do
       visit projects_path
       click_on "プロジェクトを追加する"
 
@@ -105,7 +120,7 @@ RSpec.describe "Projects", type: :system do
   end
 
   describe "プロジェクト編集" do
-    it "プロジェクトを編集できること", js: true do
+    it "プロジェクトを編集できること", playwright: true do
       visit projects_path
       original_name = find("turbo-frame#project_#{project2.id}").text
 
@@ -119,7 +134,7 @@ RSpec.describe "Projects", type: :system do
       expect(original_name).not_to eq "新しいプロジェクト名"
     end
 
-    it "プロジェクトの編集をやめられること", js: true do
+    it "プロジェクトの編集をやめられること", playwright: true do
       visit projects_path
       original_name = find("turbo-frame#project_#{project2.id}").text
 
@@ -133,7 +148,7 @@ RSpec.describe "Projects", type: :system do
       expect(original_name).not_to eq "新しいプロジェクト名"
     end
 
-    it "複数のプロジェクトの編集フォームがそれぞれ独立して表示できること", js: true do
+    it "複数のプロジェクトの編集フォームがそれぞれ独立して表示できること", playwright: true do
       visit projects_path
 
       expect(page).to have_selector("turbo-frame#project_#{project1.id}")
@@ -161,7 +176,7 @@ RSpec.describe "Projects", type: :system do
       expect(page).to have_selector("turbo-frame#project_#{project2.id} input#project_name")
     end
 
-    it "同時に複数のプロジェクトの編集フォームが表示でき、それぞれの状況は互いに影響を及ぼさないこと", js: true do
+    it "同時に複数のプロジェクトの編集フォームが表示でき、それぞれの状況は互いに影響を及ぼさないこと", playwright: true do
       visit projects_path
       original_project1_name = find("turbo-frame#project_#{project1.id} h3").text
       original_project2_name = find("turbo-frame#project_#{project2.id} h3").text
@@ -198,7 +213,7 @@ RSpec.describe "Projects", type: :system do
       expect(find("turbo-frame#project_#{project2.id} h3").text).to eq "新しいプロジェクト名2" 
     end
 
-    it "同時に複数のプロジェクトの編集フォームが表示でき、それぞれ個別に編集をやめられること", js: true do
+    it "同時に複数のプロジェクトの編集フォームが表示でき、それぞれ個別に編集をやめられること", playwright: true do
       visit projects_path
       original_project1_name = find("turbo-frame#project_#{project1.id} h3").text
       original_project2_name = find("turbo-frame#project_#{project2.id} h3").text
@@ -226,7 +241,7 @@ RSpec.describe "Projects", type: :system do
       expect(find("turbo-frame#project_#{project1.id} input#project_name").value).to eq original_project1_name
     end
 
-    it "編集フォームと登録フォームを同時に表示でき、それぞれ個別に操作できること", js: true do
+    it "編集フォームと登録フォームを同時に表示でき、それぞれ個別に操作できること", playwright: true do
       visit projects_path
 
       original_project1_name = find("turbo-frame#project_#{project1.id} h3").text
@@ -267,20 +282,25 @@ RSpec.describe "Projects", type: :system do
   end
 
   describe "プロジェクト削除" do
-    it "プロジェクトを削除できること", js: true do
+    it "⭐️プロジェクトを削除できること", playwright: true do
       visit projects_path
-      expect{
-        within("turbo-frame#project_#{project1.id}") do
-          accept_confirm("本当に削除しますか？") do
-            click_on "削除"
-          end
-        end
-      }.to change(Project, :count).by(-1)
 
-      expect(page).not_to have_content(project1.name)
+      initial_count = Project.count
+
+      within("turbo-frame#project_#{project1.id}") do
+        accept_confirm("本当に削除しますか？") do
+          click_on "削除"
+        end
+      end
+
+      within("#projects") do
+        expect(page).not_to have_content(project1.name)
+      end
+
+      expect(Project.count).to eq(initial_count - 1)
     end
 
-    it "プロジェクトを削除を中止できること", js: true do
+    it "プロジェクトを削除を中止できること", playwright: true do
       visit projects_path
       expect{
         within("turbo-frame#project_#{project1.id}") do

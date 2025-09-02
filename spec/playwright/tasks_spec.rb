@@ -52,7 +52,7 @@ RSpec.describe "Tasks with Playwright", type: :system do
     expect(outside_project_tasks).to be_empty
   end
 
-  it "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること" do
+  it "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること", playwright: true do
     visit project_path(project1.id)
     expect(page).to have_selector("button", text: "すべて完了にする")
 
@@ -62,10 +62,11 @@ RSpec.describe "Tasks with Playwright", type: :system do
 
     expect(page).not_to have_selector("button", text: "すべて完了にする", wait: 6)
 
-    save_and_open_page
-
     within("#project-tasks") do
       expect(page).to have_content("Done", count: 2, wait: 1)
     end
+
+    expect(project1_task_a.reload.status).to be true
+    expect(project1_task_b.reload.status).to be true
   end
 end
