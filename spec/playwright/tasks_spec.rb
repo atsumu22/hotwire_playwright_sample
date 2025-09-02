@@ -13,8 +13,8 @@ RSpec.describe "Tasks with Playwright", type: :system do
 
     click_on "タスクを追加する"
 
-    expect(page).to have_selector('[data-modal-target="modal"]', visible: true)
-    expect(page).to have_selector('[data-modal-target="content"]', visible: true)
+    expect(page).to have_selector('[data-modal-target="modal"]')
+    expect(page).to have_selector('[data-modal-target="content"]')
 
     within('[data-modal-target="content"]') do
       expect(page).to have_content("タスクを登録する")
