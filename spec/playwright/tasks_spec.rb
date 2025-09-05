@@ -5,7 +5,7 @@ RSpec.describe "Tasks with Playwright", type: :system do
   let!(:project1_task_a) { FactoryBot.create(:task, title: "sample task1", project: project1) }
   let!(:project1_task_b) { FactoryBot.create(:task, title: "sample task2", project: project1) }
 
-  it "タスク追加ボタンをクリックすると、モーダルが現れること", playwright: true do
+  it "(Playwright)タスク追加ボタンをクリックすると、モーダルが現れること", playwright: true do
     visit "/projects/#{project1.id}"
 
     expect(page).to have_selector("a", text: "タスクを追加する")
@@ -15,7 +15,7 @@ RSpec.describe "Tasks with Playwright", type: :system do
     expect(page).to have_selector('[data-modal-target="content"]')
   end
 
-  it "【Playwright】新規タスクがproject-tasks内に正しく追加されること", playwright: true do
+  it "(Playwright)新規タスクがproject-tasks内に正しく追加されること", playwright: true do
     visit "/projects/#{project1.id}"
 
     # モーダルを開いて新しいタスクを追加
@@ -45,7 +45,7 @@ RSpec.describe "Tasks with Playwright", type: :system do
     expect(new_task.sort_order).to eq(5)
   end
 
-  it "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること", playwright: true do
+  it "(Playwright)すべて完了にするボタンで一定時間待機後全タスクが完了状態になること", playwright: true do
     visit project_path(project1.id)
 
     expect(page).to have_button("すべて完了にする")
@@ -62,8 +62,7 @@ RSpec.describe "Tasks with Playwright", type: :system do
     expect(project1_task_b.reload.status).to be true
   end
 
-  describe "cupriteのテストをそのままコピー" do
-    it "タスク追加ボタンをクリックすると、モーダルが現れること", playwright: true do
+    it "(Cuprite)タスク追加ボタンをクリックすると、モーダルが現れること", playwright: true do
       visit project_path(project1.id)
 
       expect(page).not_to have_selector('[data-modal-target="modal"]')
@@ -83,7 +82,7 @@ RSpec.describe "Tasks with Playwright", type: :system do
       end
     end
 
-    it "新規タスクがproject-tasks内に正しく追加されること", playwright: true do
+    it "(Cuprite)新規タスクがproject-tasks内に正しく追加されること", playwright: true do
       visit project_path(project1.id)
       expect(page).not_to have_selector('[data-modal-target="modal"]')
       expect(page).to have_selector("a", text: "タスクを追加する")
@@ -110,7 +109,7 @@ RSpec.describe "Tasks with Playwright", type: :system do
       expect(outside_project_tasks).to be_empty
     end
 
-    it "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること、また全て完了にするボタンは非表示になること", playwright: true do
+    it "(Cuprite)すべて完了にするボタンで一定時間待機後全タスクが完了状態になること、また全て完了にするボタンは非表示になること", playwright: true do
       visit project_path(project1.id)
       expect(page).to have_selector("button", text: "すべて完了にする")
 
@@ -127,5 +126,23 @@ RSpec.describe "Tasks with Playwright", type: :system do
       expect(project1_task_a.reload.status).to be true
       expect(project1_task_b.reload.status).to be true
     end
+
+  it "デバッグ: Stimulusイベントのタイミング確認", playwright: true do
+    visit project_path(project1.id)
+    
+    click_button "すべて完了にする"
+    
+    # オーバーレイ表示の確認
+    expect(page).to have_selector('[data-complete-all-target="overlay"]', visible: true, wait: 3)
+    puts "オーバーレイ表示確認: OK"
+    
+    # 3秒後の状態を確認
+    sleep 4
+    overlay_classes = page.find('[data-complete-all-target="overlay"]')[:class]
+    puts "4秒後のオーバーレイクラス: #{overlay_classes}"
+    
+    # ボタンエリアの状態確認
+    button_area_classes = page.find('[data-complete-all-target="buttonArea"]')[:class]
+    puts "ボタンエリアクラス: #{button_area_classes}"
   end
 end
