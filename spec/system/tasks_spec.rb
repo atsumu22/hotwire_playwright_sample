@@ -127,5 +127,25 @@ RSpec.describe "Tasks", type: :system do
     expect(project1_task_a.reload.status).to be true
     expect(project1_task_b.reload.status).to be true
   end
+
+
+  it "デバッグ: Stimulusイベントのタイミング確認", playwright: true do
+    visit project_path(project1.id)
+    
+    click_button "すべて完了にする"
+    
+    # オーバーレイ表示の確認
+    expect(page).to have_selector('[data-complete-all-target="overlay"]', visible: true, wait: 3)
+    puts "オーバーレイ表示確認: OK"
+    
+    # 3秒後の状態を確認
+    sleep 4
+    overlay_classes = page.find('[data-complete-all-target="overlay"]')[:class]
+    puts "4秒後のオーバーレイクラス: #{overlay_classes}"
+    
+    # ボタンエリアの状態確認
+    button_area_classes = page.find('[data-complete-all-target="buttonArea"]')[:class]
+    puts "ボタンエリアクラス: #{button_area_classes}"
+  end
 end
 
