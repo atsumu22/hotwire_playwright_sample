@@ -128,24 +128,18 @@ RSpec.describe "Tasks", type: :system do
     expect(project1_task_b.reload.status).to be true
   end
 
-
-  it "デバッグ: Stimulusイベントのタイミング確認", playwright: true do
+  it "デバッグ: タスクステータスの更新確認", js: true do
     visit project_path(project1.id)
+    
+    puts "更新前のステータス: #{project1_task_a.reload.status}"
     
     click_button "すべて完了にする"
     
-    # オーバーレイ表示の確認
-    expect(page).to have_selector('[data-complete-all-target="overlay"]', visible: true, wait: 3)
-    puts "オーバーレイ表示確認: OK"
+    # オーバーレイ完了まで待機
+    expect(page).to have_selector('[data-complete-all-target="overlay"]', visible: false, wait: 15)
     
-    # 3秒後の状態を確認
-    sleep 4
-    overlay_classes = page.find('[data-complete-all-target="overlay"]')[:class]
-    puts "4秒後のオーバーレイクラス: #{overlay_classes}"
-    
-    # ボタンエリアの状態確認
-    button_area_classes = page.find('[data-complete-all-target="buttonArea"]')[:class]
-    puts "ボタンエリアクラス: #{button_area_classes}"
+    puts "更新後のステータス: #{project1_task_a.reload.status}"
+    puts "画面上の.bg-green-100の数: #{page.all('.bg-green-100').count}"
   end
 end
 
