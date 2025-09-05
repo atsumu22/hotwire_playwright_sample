@@ -72,7 +72,7 @@ RSpec.describe "Tasks", type: :system do
   end
 
   describe "Playwrightのテストをそのままコピー" do
-    it "タスク追加ボタンをクリックすると、モーダルが現れること", playwright: true do
+    it "タスク追加ボタンをクリックすると、モーダルが現れること", js: true do
       visit "/projects/#{project1.id}"
 
       expect(page).to have_selector("a", text: "タスクを追加する")
@@ -82,7 +82,7 @@ RSpec.describe "Tasks", type: :system do
       expect(page).to have_selector('[data-modal-target="content"]')
     end
 
-    it "【Playwright】新規タスクがproject-tasks内に正しく追加されること", playwright: true do
+    it "【Playwright】新規タスクがproject-tasks内に正しく追加されること", js: true do
       visit "/projects/#{project1.id}"
 
       # モーダルを開いて新しいタスクを追加
@@ -112,7 +112,7 @@ RSpec.describe "Tasks", type: :system do
       expect(new_task.sort_order).to eq(5)
     end
 
-    it "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること", playwright: true do
+    it "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること", js: true do
       visit project_path(project1.id)
 
       expect(page).to have_button("すべて完了にする")
