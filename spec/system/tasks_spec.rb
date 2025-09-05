@@ -6,7 +6,7 @@ RSpec.describe "Tasks", type: :system do
   let!(:project1_task_a) { FactoryBot.create(:task, title: "sample task1", project: project1) }
   let!(:project1_task_b) { FactoryBot.create(:task, title: "sample task2", project: project1) }
 
-  it "タスク追加ボタンをクリックすると、モーダルが現れること", js: true do
+  it "(Cuprite)タスク追加ボタンをクリックすると、モーダルが現れること", js: true do
     visit project_path(project1.id)
 
     expect(page).not_to have_selector('[data-modal-target="modal"]')
@@ -26,7 +26,7 @@ RSpec.describe "Tasks", type: :system do
     end
   end
 
-  it "新規タスクがproject-tasks内に正しく追加されること", js: true do
+  it "(Cuprite)新規タスクがproject-tasks内に正しく追加されること", js: true do
     visit project_path(project1.id)
     expect(page).not_to have_selector('[data-modal-target="modal"]')
     expect(page).to have_selector("a", text: "タスクを追加する")
@@ -53,7 +53,7 @@ RSpec.describe "Tasks", type: :system do
     expect(outside_project_tasks).to be_empty
   end
 
-  it "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること、また全て完了にするボタンは非表示になること", js: true do
+  it "(Cuprite)すべて完了にするボタンで一定時間待機後全タスクが完了状態になること、また全て完了にするボタンは非表示になること", js: true do
     visit project_path(project1.id)
     expect(page).to have_selector("button", text: "すべて完了にする")
 
@@ -71,63 +71,61 @@ RSpec.describe "Tasks", type: :system do
     expect(project1_task_b.reload.status).to be true
   end
 
-  describe "Playwrightのテストをそのままコピー" do
-    it "タスク追加ボタンをクリックすると、モーダルが現れること", js: true do
-      visit "/projects/#{project1.id}"
+  it "(Playwright)タスク追加ボタンをクリックすると、モーダルが現れること", js: true do
+    visit "/projects/#{project1.id}"
 
-      expect(page).to have_selector("a", text: "タスクを追加する")
-      click_on "タスクを追加する"
+    expect(page).to have_selector("a", text: "タスクを追加する")
+    click_on "タスクを追加する"
 
-      expect(page).to have_selector('[data-modal-target="modal"]')
-      expect(page).to have_selector('[data-modal-target="content"]')
-    end
+    expect(page).to have_selector('[data-modal-target="modal"]')
+    expect(page).to have_selector('[data-modal-target="content"]')
+  end
 
-    it "【Playwright】新規タスクがproject-tasks内に正しく追加されること", js: true do
-      visit "/projects/#{project1.id}"
+  it "(Playwright)新規タスクがproject-tasks内に正しく追加されること", js: true do
+    visit "/projects/#{project1.id}"
 
       # モーダルを開いて新しいタスクを追加
-      click_on "タスクを追加する"
-      expect(page).to have_selector('[data-modal-target="modal"]', visible: true)
+    click_on "タスクを追加する"
+    expect(page).to have_selector('[data-modal-target="modal"]', visible: true)
 
-      within('[data-modal-target="content"]') do
-        fill_in "task[title]", with: "project-tasks内確認用タスク"
-        fill_in "task[sort_order]", with: "5"
+    within('[data-modal-target="content"]') do
+      fill_in "task[title]", with: "project-tasks内確認用タスク"
+      fill_in "task[sort_order]", with: "5"
 
-        click_button "登録する"
-      end
+      click_button "登録する"
+    end
 
       # モーダルが閉じることを確認
-      expect(page).to have_selector('[data-modal-target="modal"]', visible: false, wait: 5)
+    expect(page).to have_selector('[data-modal-target="modal"]', visible: false, wait: 5)
 
       # シンプルに新しいタスクの存在確認
-      using_wait_time(10) do
-        within("#project-tasks") do
-          expect(page).to have_content("project-tasks内確認用タスク")
-        end
+    using_wait_time(10) do
+      within("#project-tasks") do
+        expect(page).to have_content("project-tasks内確認用タスク")
       end
+    end
 
       # データベースの確認
-      new_task = project1.tasks.find_by(title: "project-tasks内確認用タスク")
-      expect(new_task).to be_present
-      expect(new_task.sort_order).to eq(5)
-    end
+    new_task = project1.tasks.find_by(title: "project-tasks内確認用タスク")
+    expect(new_task).to be_present
+    expect(new_task.sort_order).to eq(5)
+  end
 
-    it "すべて完了にするボタンで一定時間待機後全タスクが完了状態になること", js: true do
-      visit project_path(project1.id)
+  it "(Playwright)すべて完了にするボタンで一定時間待機後全タスクが完了状態になること", js: true do
+    visit project_path(project1.id)
 
-      expect(page).to have_button("すべて完了にする")
-      overlay = page.find('[data-complete-all-target="overlay"]', visible: false)
-      expect(overlay[:class]).to include('hidden')
+    expect(page).to have_button("すべて完了にする")
+    overlay = page.find('[data-complete-all-target="overlay"]', visible: false)
+    expect(overlay[:class]).to include('hidden')
 
-      click_button "すべて完了にする"
+    click_button "すべて完了にする"
 
-      expect(page).to have_selector('[data-complete-all-target="overlay"]', visible: true, wait: 3)
+    expect(page).to have_selector('[data-complete-all-target="overlay"]', visible: true, wait: 3)
 
-      expect(page).to have_selector('[data-complete-all-target="overlay"]', visible: false, wait: 15)
-      expect(page).to have_selector('.bg-green-100', count: 2)
-      expect(project1_task_a.reload.status).to be true
-      expect(project1_task_b.reload.status).to be true
-    end
+    expect(page).to have_selector('[data-complete-all-target="overlay"]', visible: false, wait: 15)
+    expect(page).to have_selector('.bg-green-100', count: 2)
+    expect(project1_task_a.reload.status).to be true
+    expect(project1_task_b.reload.status).to be true
   end
 end
 
