@@ -127,37 +127,17 @@ RSpec.describe "Tasks with Playwright", type: :system do
       expect(project1_task_b.reload.status).to be true
     end
 
-  it "デバッグ: 要素の存在確認", playwright: true do
+  it "デバッグ: タスクステータスの更新確認", playwright: true do
     visit project_path(project1.id)
     
-    # すべてのdata-complete-all-target要素を確認
-    puts "Button: #{page.has_selector?('[data-complete-all-target="button"]')}"
-    puts "ButtonArea: #{page.has_selector?('[data-complete-all-target="buttonArea"]')}"
-    puts "Overlay: #{page.has_selector?('[data-complete-all-target="overlay"]')}"
-    
-    # オーバーレイ要素のHTML構造を確認
-    if page.has_selector?('[data-complete-all-target="overlay"]', visible: :all)
-      overlay = page.find('[data-complete-all-target="overlay"]', visible: :all)
-      puts "Overlay classes: #{overlay[:class]}"
-      puts "Overlay visible: #{overlay.visible?}"
-    else
-      puts "オーバーレイ要素が見つかりません"
-    end
-  end
-
-  it "デバッグ: 表示状態の変化タイミング", playwright: true do
-    visit project_path(project1.id)
-    
-    puts "クリック前: #{page.find('[data-complete-all-target="overlay"]', visible: :all)[:class]}"
+    puts "更新前のステータス: #{project1_task_a.reload.status}"
     
     click_button "すべて完了にする"
     
-    # 短い間隔で状態をチェック
-    (0..10).each do |i|
-      sleep 0.1
-      overlay = page.find('[data-complete-all-target="overlay"]', visible: :all)
-      puts "#{i * 0.1}秒後: #{overlay[:class]}, visible: #{overlay.visible?}"
-      break if overlay.visible?
-    end
+    # オーバーレイ完了まで待機
+    expect(page).to have_selector('[data-complete-all-target="overlay"]', visible: false, wait: 15)
+    
+    puts "更新後のステータス: #{project1_task_a.reload.status}"
+    puts "画面上の.bg-green-100の数: #{page.all('.bg-green-100').count}"
   end
 end
