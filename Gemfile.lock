@@ -93,10 +93,6 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
-    capybara-playwright-driver (0.5.7)
-      addressable
-      capybara
-      playwright-ruby-client (>= 1.16.0)
     capybara-screenshot (1.0.26)
       capybara (>= 1.0, < 4)
       launchy
@@ -167,10 +163,6 @@ GEM
       net-smtp
     marcel (1.0.4)
     matrix (0.4.3)
-    mime-types (3.7.0)
-      logger
-      mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2025.0812)
     mini_mime (1.1.5)
     minitest (5.25.5)
     net-imap (0.5.9)
@@ -199,9 +191,6 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.8-x86_64-linux-musl)
       racc (~> 1.4)
-    playwright-ruby-client (1.54.1)
-      concurrent-ruby (>= 1.1.6)
-      mime-types (>= 3.0)
     pp (0.6.2)
       prettyprint
     prettyprint (0.2.0)
@@ -345,7 +334,6 @@ DEPENDENCIES
   acts_as_list
   bundler-audit
   capybara
-  capybara-playwright-driver
   capybara-screenshot
   cuprite
   debug

@@ -1,24 +1,30 @@
-# README
+# Hotwire Playwright Sample
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+CupriteとPlaywrightのシステムテスト比較検証用のサンプルアプリケーションです。
 
-Things you may want to cover:
+## セットアップ
 
-* Ruby version
+```bash
+git clone https://github.com/atsumu22/hotwire_playwright_sample.git
+cd hotwire_playwright_sample
 
-* System dependencies
+bundle install
+rails db:create db:migrate db:seed
 
-* Configuration
+# Playwright使用の場合のみ
+bundle exec playwright install chromium
+```
 
-* Database creation
+## テスト実行
 
-* Database initialization
+### Cupriteドライバ
+```bash
+git checkout cuprite
+bundle exec rspec spec/system/
+```
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+### Playwrightドライバ
+```bash
+git checkout playwright  
+bundle exec rspec spec/playwright/
+```
