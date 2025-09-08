@@ -2,11 +2,12 @@ require "rails_helper"
 
 RSpec.describe "Tasks with Playwright", type: :system do
   let!(:project1) { FactoryBot.create(:project, name: "最初のプロジェクト") }
+  let!(:project2) { FactoryBot.create(:project, name: "2番目のプロジェクト") }
   let!(:project1_task_a) { FactoryBot.create(:task, title: "sample task1", project: project1) }
   let!(:project1_task_b) { FactoryBot.create(:task, title: "sample task2", project: project1) }
 
   it "(Playwright)タスク追加ボタンをクリックすると、モーダルが現れること", playwright: true do
-    visit "/projects/#{project1.id}"
+    visit project_path(project1.id)
 
     expect(page).to have_selector("a", text: "タスクを追加する")
     click_on "タスクを追加する"
@@ -16,7 +17,8 @@ RSpec.describe "Tasks with Playwright", type: :system do
   end
 
   it "(Playwright)新規タスクがproject-tasks内に正しく追加されること", playwright: true do
-    visit "/projects/#{project1.id}"
+    visit project_path(project1.id)
+    expect(page).not_to have_selector('[data-modal-target="modal"]')
 
     # モーダルを開いて新しいタスクを追加
     click_on "タスクを追加する"
