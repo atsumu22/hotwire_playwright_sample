@@ -24,6 +24,4 @@ RSpec.configure do |config|
   config.before(:each, type: :system, playwright: true) do
     driven_by(:playwright, screen_size: [1400, 1400])
   end
-
-  Capybara.server = :puma, { Silent: true }
 end
